@@ -1,0 +1,27 @@
+.chat-cols { display: grid; grid-template-columns: minmax(0, 760px) 320px; gap: 32px; justify-content: center; align-items: start; }
+.chat-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.chat-title { max-width: 1112px; width: 100%; margin: 0 auto; }
+.thread { display: flex; flex-direction: column; gap: 16px; }
+.umsg { align-self: flex-end; max-width: 85%; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+.umsg .bubble { background: var(--color-action-tertiary-bg); border-radius: var(--radius-card); padding: 10px 16px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.amsg .a-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.amsg .a-who { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-text-muted); }
+.amsg .a-text { font-size: 17px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.amsg .a-foot { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--color-border-subtle); padding-top: 12px; }
+.amsg .tool { font-size: 13px; color: var(--color-text-muted); background: var(--color-bg-subtle); border-radius: var(--radius-control); padding: 6px 10px; }
+.starters { display: flex; flex-direction: column; gap: 8px; }
+.starter { text-align: left; background: var(--color-surface-default); border: 1px solid var(--color-border-default); border-radius: var(--radius-control); padding: 10px 14px; }
+.starter:hover { border-color: var(--color-border-strong); }
+.err-card { border: 1px solid var(--color-border-danger); }
+.composer-card textarea { min-height: 96px; }
+.tips { position: sticky; top: 88px; }
+.tips ul { list-style: none; margin: 0; padding: 0; }
+.tips li { padding: 12px 0; font-size: 13px; }
+.tips li + li { border-top: 1px solid var(--color-border-subtle); }
+@media (max-width: 900px) {
+  .chat-cols { grid-template-columns: minmax(0, 1fr); }
+  .tips { display: none; }
+  .dial .seg { flex-wrap: wrap; }
+  .dial .seg button { flex: 1 1 30%; white-space: nowrap; padding: 8px 6px; }
+  .umsg { max-width: 92%; }
+}
