@@ -1,0 +1,21 @@
+/* จัดรูปแบบ: tokens only. */
+.fm-paste textarea { min-height: 320px; font-size: 15px; }
+.fm-tray-item { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; }
+.fm-tray-text { font-size: 15px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.fm-tray-guess { font-size: 13px; color: var(--color-text-muted); }
+.fm-tray-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.fm-choose { display: flex; flex-wrap: wrap; gap: 6px; }
+.fm-raw { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 14px; color: var(--color-text-muted); max-height: 320px; overflow: auto; }
+.fm-sug { display: flex; flex-direction: column; gap: 8px; padding: 16px 0; }
+.fm-sug-top { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; }
+.fm-sug-kind { font-weight: 500; }
+.fm-sug-where { color: var(--color-text-muted); }
+.fm-orig { color: var(--color-text-muted); text-decoration: line-through; overflow-wrap: anywhere; }
+.fm-new { text-decoration: underline; overflow-wrap: anywhere; }
+.fm-sug-btns { display: flex; gap: 8px; align-items: center; }
+.fm-done { font-size: 13px; color: var(--color-feedback-success-text); font-weight: 500; display: flex; gap: 12px; align-items: center; }
+.fm-muted { font-size: 13px; color: var(--color-text-muted); }
+.fm-strong-danger { color: var(--color-text-danger); font-weight: 600; }
+.card-head .fm-select { width: auto; flex: none; max-width: 60%; padding: 4px 8px; font-size: 13px; }
+.card-head h3 { white-space: nowrap; }
+.fm-loading { display: flex; flex-direction: column; gap: 12px; min-width: 260px; }

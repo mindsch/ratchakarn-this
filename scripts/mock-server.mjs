@@ -27,7 +27,22 @@ createServer(async (req, res) => {
     if (body.tools?.length && last.role === "user") {
       return json(res, 200, { choices: [{ message: { role: "assistant", content: null, tool_calls: [{ id: "c1", type: "function", function: { name: "lookup_agency", arguments: JSON.stringify({ name: "เทศบาลตัวอย่าง" }) } }] } }] });
     }
-    const answer = last.role === "tool" ? `ได้รับข้อมูลจากเครื่องมือแล้ว: ${last.content}` : `[mock รับระบบพรอมต์ ${msgs[0].content.length} ตัวอักษร] ขอเรียนว่า ${String(last.content).split("\n").pop()} จึงเรียนมาเพื่อโปรดทราบ`;
+    let override = null;
+    const sys = String(msgs[0]?.content ?? "");
+    const user = String(last.content ?? "");
+    // AI ตรวจทั้งฉบับ (prompts/modes/check.md): JSON suggestions only, built from the user's own text so `original` matches.
+    if (sys.includes("\"original\"") && sys.includes("\"field\"")) {
+      const subj = user.match(/^เรื่อง[:：]\s*(.+)$/m)?.[1]?.trim();
+      const out = [
+        ...(subj ? [{ kind: "ภาษาราชการ", field: "head:เรื่อง", original: subj, suggestion: subj.replace(/^ขอ/, "ขอเรียน"), note: "mock" }] : []),
+        { kind: "ข้อมูลขาด", field: "head:ที่", original: "", suggestion: "เลขที่หนังสือคืออะไร" },
+        { kind: "สะกดคำ", field: "body", original: "ข้อความที่ไม่มีในเอกสาร", suggestion: "x", note: "must be rejected by the invariant" },
+      ];
+      override = "```json\n" + JSON.stringify(out) + "\n```";
+    }
+    // เติมช่องจากเรื่องเล่า (prompts/modes/prefill.md): JSON object, unknown slots null.
+    if (sys.includes("เติมช่องจากเรื่องเล่า")) override = "```json\n{}\n```";
+    const answer = override ?? (last.role === "tool" ? `ได้รับข้อมูลจากเครื่องมือแล้ว: ${last.content}` : `[mock รับระบบพรอมต์ ${msgs[0].content.length} ตัวอักษร] ขอเรียนว่า ${String(last.content).split("\n").pop()} จึงเรียนมาเพื่อโปรดทราบ`);
     if (!body.stream) return json(res, 200, { choices: [{ message: { role: "assistant", content: answer } }] });
     res.writeHead(200, { "Content-Type": "text/event-stream", ...CORS });
     for (const piece of answer.match(/.{1,6}/gs)) res.write(`data: ${JSON.stringify({ choices: [{ delta: { content: piece } }] })}\n\n`);

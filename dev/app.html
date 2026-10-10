@@ -1,0 +1,18 @@
+<!doctype html>
+<!-- Dev only. Renders the app in an iframe of width ?w= (headless Chrome can't go below ~500px wide).
+     ?mock=1 points AI settings at scripts/mock-server.mjs; the first-run dialog is always dismissed here.
+     Example: /dev/app.html?w=390&mock=1#/format -->
+<html><body style="margin:0;background:#888">
+<iframe id="f" style="height:100vh;border:0;display:block;background:#fff"></iframe>
+<script>
+  const q = new URLSearchParams(location.search);
+  localStorage.setItem("ratchakarn.firstrun.v1", "1");
+  if (q.get("mock") === "1") {
+    localStorage.setItem("ratchakarn.settings.v1", JSON.stringify({ presetId: "custom", kind: "openai", baseUrl: "http://localhost:8787/v1", model: "mock", rememberKey: true, mcp: [] }));
+    localStorage.setItem("ratchakarn.apikey.v1", "mock-key");
+  }
+  const f = document.getElementById("f");
+  f.style.width = (q.get("w") || "1440") + "px";
+  f.src = "/" + location.hash;
+</script>
+</body></html>
