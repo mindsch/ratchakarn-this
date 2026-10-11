@@ -29,5 +29,12 @@ Index page: https://lbphkc.coj.go.th/th/content/category/detail/id/35/cid/8415/i
 - คำร้อง: ขอดำเนินคดีตนเอง, ขอส่งหมายสองแห่ง, ขอยื่นบัญชีระบุพยานเพิ่มเติม, ขออนุญาตดำเนินกระบวนพิจารณา, ขอถอนฟ้อง, ขอคัดถ่ายเอกสาร, ขอหมายตั้งเจ้าพนักงานบังคับคดี, ขอเฉลี่ยทรัพย์, ขอรับเงิน, ขออนุญาตฟ้องคดี ณ ภูมิลำเนา.
 - Read so far: only the ค่าจ้างอย่างเดียว template (converted with macOS `textutil`; Thai text readable, FORMTEXT fields = fill-ins). Local copy was in scratch, re-download for the build. The other templates, and the court's contact (lbphkc@coj.go.th, 25 ถ.ดำรง ต.ตลาดใหญ่ อ.เมือง ภูเก็ต) are not yet used.
 
-## Legal flags
-- ครุฑ: พ.ร.บ.เครื่องหมายครุฑพ่าห์ พ.ศ. 2534 and (ฉบับที่ 2) พ.ศ. 2535 exist (cited in a Khaosod case report); text unread. Related: พ.ร.บ.เครื่องหมายราชการ พ.ศ. 2482.
+## Legal flags: ครุฑ (read 2026-10-10)
+Source read: Wikisource copy of พ.ร.บ.เครื่องหมายครุฑพ่าห์ พ.ศ. 2534 (ราชกิจจานุเบกษา เล่ม 108 ตอนที่ 199 ฉบับพิเศษ, 15 พ.ย. 2534). https://th.wikisource.org/wiki/พระราชบัญญัติเครื่องหมายครุฑพ่าห์_พ.ศ._๒๕๓๔ . Read through a summarising fetch, not word for word, so quote nothing from it without opening the page.
+- ม.4: "เครื่องหมายครุฑพ่าห์" = a garuda figure in any pose, with or without text or pictures (so a look-alike garuda is also covered).
+- ม.5: use in government work follows cabinet rules published in the Gazette. ม.6: royal household use at His Majesty's discretion. ม.7: use "in other cases" follows a royal decree. ม.8-11: "ตราตั้ง" (royal supplier warrant) for qualifying juristic persons, issued by the Prime Minister.
+- ม.12: breaching a decree under ม.7 or ม.8 → up to 6 months, fine up to 3,000 baht, or both.
+- **ม.13: someone with no right to use the emblem/warrant who uses it to make others believe they have that right → up to 1 year, fine up to 6,000 baht, or both.** The offence turns on use without the right plus the intent to make others believe they have it.
+- No general exemption for private individuals appears in the Act text.
+- **Not read:** the royal decree and cabinet rules under ม.5/ม.7 (they decide who may use it and when), and the 1992 amendment (ฉบับที่ 2 พ.ศ. 2535, amends ม.3 and ม.6, cited in a news report). Not found by search; check ratchakitcha.soc.go.th or krisdika.go.th.
+- Also related: พ.ร.บ.เครื่องหมายราชการ พ.ศ. 2482 (news report: up to 1 year / 2,000 baht), not read.
