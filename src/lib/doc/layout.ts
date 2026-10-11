@@ -326,6 +326,9 @@ function court(d: DocData, pf: LayoutProfile): Block[] {
   return out;
 }
 
+const hasGarudaBlock = (blocks: Block[]): boolean =>
+  blocks.some((b) => b.k === "garuda" || (b.k === "cols" && (hasGarudaBlock(b.left) || hasGarudaBlock(b.right))));
+
 export function buildBlocks(d: DocData, opts: RenderOptions): Block[] {
   const def = DOC_TYPES[d.type];
   const pf = opts.profile;
@@ -347,6 +350,12 @@ export function buildBlocks(d: DocData, opts: RenderOptions): Block[] {
       break;
     default:
       blocks = letter(d, pf);
+  }
+  // Some families (petitions and court forms) do not normally reserve a Garuda
+  // slot. When the user explicitly supplies and enables an image, add a real
+  // header block so the shared export control works for every document type.
+  if (opts.garudaImage && !hasGarudaBlock(blocks)) {
+    blocks = [{ k: "garuda", heightCm: pf.garudaExternalCm, align: "center" }, ...blocks];
   }
   return opts.thaiDigits ? mapText(blocks, toThaiDigits) : blocks;
 }

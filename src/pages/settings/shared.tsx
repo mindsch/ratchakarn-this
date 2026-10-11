@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { runAi } from "../../lib/ai";
 import { PRESETS } from "../../lib/llm/presets";
 import { LlmError } from "../../lib/llm/providers";
-import type { Settings } from "../../lib/settings";
+import { providerPatch, type Settings } from "../../lib/settings";
 
 const SHORT: Record<string, string> = { thaillm: "ThaiLLM", typhoon: "Typhoon", ollama: "Ollama", openrouter: "OpenRouter", openai: "OpenAI", anthropic: "Claude", gemini: "Gemini", custom: "กำหนดเอง" };
 
@@ -18,18 +18,27 @@ export function ProviderChips({ settings, update }: { settings: Settings; update
             role="radio"
             aria-checked={p.id === settings.presetId}
             className={"pchip" + (p.id === settings.presetId ? " on" : "")}
-            onClick={() => update({ presetId: p.id, kind: p.kind, baseUrl: p.baseUrl })}
+            onClick={() => {
+              if (p.id === settings.presetId) return;
+              update(providerPatch(settings, p));
+            }}
           >
             {SHORT[p.id] ?? p.label}
           </button>
         ))}
       </div>
+      <p className="current-provider" aria-live="polite">
+        กำลังใช้ <strong>{SHORT[settings.presetId] ?? preset?.label ?? settings.presetId}</strong>
+        {settings.model.trim() ? <> · โมเดล <strong>{settings.model}</strong></> : <> · <strong>ยังไม่ได้เลือกโมเดล</strong></>}
+      </p>
       {preset && <p className="t-body-s muted">{preset.note}</p>}
     </>
   );
 }
 
-export type TestState = { state: "idle" | "busy" | "ok" | "fail"; msg?: string };
+export const connectionFingerprint = (s: Settings) => [s.presetId, s.kind, s.baseUrl.trim(), s.model.trim(), s.apiKey].join("\u0000");
+
+export type TestState = { state: "idle" | "busy" | "ok" | "fail"; msg?: string; fingerprint?: string };
 
 /** A tiny real request, so "เชื่อมต่อแล้ว" means something. */
 export function useConnectionTest() {
@@ -43,11 +52,15 @@ export function useConnectionTest() {
     const timer = setTimeout(() => c.abort(), 20000);
     try {
       const out = await runAi(s, "ตอบสั้นที่สุด", "ตอบว่า OK", c.signal);
-      setT({ state: "ok", msg: out.trim() ? "เชื่อมต่อได้ โมเดลตอบกลับแล้ว" : "เชื่อมต่อได้ แต่โมเดลตอบว่างเปล่า ลองตรวจชื่อโมเดล" });
+      if (!out.trim()) {
+        setT({ state: "fail", fingerprint: connectionFingerprint(s), msg: "เชื่อมต่อได้ แต่โมเดลตอบว่างเปล่า กรุณาตรวจชื่อโมเดลแล้วลองใหม่" });
+        return false;
+      }
+      setT({ state: "ok", fingerprint: connectionFingerprint(s), msg: "เชื่อมต่อได้ โมเดลตอบกลับแล้ว" });
       return true;
     } catch (e) {
       const m = (e as Error).name === "AbortError" ? "ไม่ตอบกลับภายใน 20 วินาที" : e instanceof LlmError ? e.message : `${(e as Error).message}`;
-      setT({ state: "fail", msg: `เชื่อมต่อไม่สำเร็จ: ${m}` });
+      setT({ state: "fail", fingerprint: connectionFingerprint(s), msg: `เชื่อมต่อไม่สำเร็จ: ${m}` });
       return false;
     } finally {
       clearTimeout(timer);

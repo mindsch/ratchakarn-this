@@ -57,14 +57,19 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
   const { docState, xp } = useApp();
   const [profileId, setProfileId] = useState("common");
   const [thaiDigits, setThaiDigits] = useState(false);
+  const [useGaruda, setUseGaruda] = useState(false);
   const [garuda, setGaruda] = useState<RenderOptions["garudaImage"]>(null);
+  const [garudaError, setGarudaError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<"ok" | "err" | null>(null);
   const [view, setView] = useState<"work" | "paper">("work");
 
   const doc = useMemo(() => finalDoc(docState), [docState]);
   const court = isCourt(doc.type);
-  const opts: RenderOptions = useMemo(() => ({ profile: PROFILES[profileId], thaiDigits, garudaImage: court ? null : garuda, showSlotHint: true }), [profileId, thaiDigits, garuda, court]);
+  const opts: RenderOptions = useMemo(
+    () => ({ profile: PROFILES[profileId], thaiDigits, garudaImage: !useGaruda ? null : garuda, showSlotHint: false }),
+    [profileId, thaiDigits, garuda, useGaruda],
+  );
   const left = countPlaceholders(doc);
   const title = `${doc.type}${doc.head["เรื่อง"] ? " " + doc.head["เรื่อง"] : ""}`.slice(0, 80);
   const profile = PROFILES[profileId];
@@ -91,12 +96,22 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
     }
   };
   const onGaruda = (f?: File | null) => {
-    if (!f) return setGaruda(null);
+    if (!f) return;
+    if (!/^image\/(png|jpeg)$/.test(f.type)) {
+      setGarudaError("รองรับเฉพาะไฟล์ PNG หรือ JPG");
+      return;
+    }
+    setUseGaruda(true);
+    setGarudaError(null);
     const r = new FileReader();
+    r.onerror = () => setGarudaError("อ่านไฟล์ภาพไม่ได้ กรุณาลองไฟล์อื่น");
     r.onload = () => {
       const dataUrl = String(r.result);
       const img = new Image();
-      img.onload = () => setGaruda({ dataUrl, widthPx: img.naturalWidth, heightPx: img.naturalHeight });
+      img.onload = () => {
+        setGaruda({ dataUrl, widthPx: img.naturalWidth, heightPx: img.naturalHeight });
+      };
+      img.onerror = () => setGarudaError("ไฟล์นี้ไม่ใช่ภาพ PNG/JPG ที่เปิดได้ กรุณาลองไฟล์อื่น");
       img.src = dataUrl;
     };
     r.readAsDataURL(f);
@@ -141,22 +156,37 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
             <div className="rows">
               <ChecklistRow
                 title="ตราครุฑ"
-                hint={court ? "เอกสารศาลไม่ใช้ตราครุฑ" : "เว้นช่องไว้ให้วางเอง ตรวจสอบสิทธิ์การใช้เอง ภาพที่อัปโหลดอยู่ในเบราว์เซอร์เท่านั้น"}
-                tag={court ? <StatusTag tone="neutral">ไม่ใช้</StatusTag> : garuda ? <StatusTag tone="success">ใส่ภาพแล้ว</StatusTag> : <StatusTag tone="info">เว้นว่าง</StatusTag>}
+                hint="ใช้ได้ทั้งเอกสารจากร่างเอกสารและจัดรูปแบบในขั้นออกเอกสาร ภาพอยู่ในเบราว์เซอร์นี้เท่านั้น"
+                tag={<Toggle checked={useGaruda} onChange={setUseGaruda} label="ใส่ตราครุฑในเอกสาร" />}
                 extra={
-                  !court && (
+                  <>
                     <span className="xp-upload">
-                      <label className="btn tertiary sm xp-file">
-                        <input type="file" accept="image/png,image/jpeg" onChange={(e) => onGaruda(e.target.files?.[0])} />
-                        อัปโหลดภาพของคุณ
-                      </label>
-                      {garuda && (
-                        <Button variant="ghost" size="sm" onClick={() => setGaruda(null)}>
+                      <StatusTag tone={garudaError ? "danger" : useGaruda && garuda ? "success" : useGaruda ? "warning" : "info"}>
+                        {garudaError ? "ไฟล์ใช้ไม่ได้" : useGaruda && garuda ? "พร้อมใช้" : useGaruda ? "กำลังอ่านภาพ" : "เว้นว่าง"}
+                      </StatusTag>
+                      <input
+                        className="input xp-file-input"
+                        type="file"
+                        accept="image/png,image/jpeg"
+                        aria-label="เลือกไฟล์ภาพตราครุฑ PNG หรือ JPG"
+                        onChange={(e) => {
+                          onGaruda(e.currentTarget.files?.[0]);
+                          e.currentTarget.value = "";
+                        }}
+                      />
+                      {useGaruda && garuda && (
+                        <Button variant="ghost" size="sm" onClick={() => { setGaruda(null); setUseGaruda(false); setGarudaError(null); }}>
                           เอาภาพออก
                         </Button>
                       )}
                     </span>
-                  )
+                    {garudaError && <p className="t-body-s danger" role="alert">{garudaError}</p>}
+                    <p className="xp-legal-note" role="note">
+                      <strong>โปรดใช้ด้วยความระมัดระวัง:</strong> ตราครุฑเป็นเครื่องหมายที่กฎหมายคุ้มครอง ควรใช้เฉพาะเมื่อคุณหรือหน่วยงานมีสิทธิ์
+                      และเอกสารประเภทนั้นอนุญาตให้ใช้{court ? " โดยเฉพาะเอกสารที่จะยื่นต่อศาลไม่ควรใส่ตราครุฑเองโดยไม่ได้รับคำแนะนำ" : ""}
+                      โปรดตรวจระเบียบที่เกี่ยวข้องและปรึกษาฝ่ายกฎหมายหรือทนายความก่อนนำเอกสารไปใช้หรือส่งจริง
+                    </p>
+                  </>
                 }
               />
               <ChecklistRow title="ฟอนต์" hint={`ติดตั้ง ${profile.fontFamily} ก่อนเปิดไฟล์ DOCX ไม่เช่นนั้นโปรแกรมจะใช้ฟอนต์อื่นแทน`} tag={<StatusTag tone="neutral">DOCX</StatusTag>} />
@@ -171,8 +201,8 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
             </p>
           </Card>
           {done && (
-            <Banner tone={done === "ok" ? "success" : "danger"} onClose={() => setDone(null)}>
-              {chrome(done === "ok" ? "exportDone" : "exportError", xp)}
+            <Banner tone={done === "ok" ? "success" : "danger"} onClose={() => setDone(null)} standard={court}>
+              {chrome(done === "ok" ? "exportDone" : "exportError", xp && !court)}
             </Banner>
           )}
           <div className="actions sticky-mobile">
@@ -191,7 +221,11 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
           {!court && <p className="xp-note">ใช้ด้วยความรับผิดชอบของผู้ใช้เอง ตรวจทานเอกสารก่อนยื่นหรือส่งทุกครั้ง</p>}
         </div>
         <div className={view === "work" ? "hide-mobile" : ""}>
-          <Paper doc={doc} options={opts} caption={`ตัวอย่าง A4 · ตราครุฑเว้นช่องไว้ให้วางเอง · สีแดง = ยังขาด (ตอนพิมพ์เป็นสีดำ)`} />
+          <Paper
+            doc={doc}
+            options={opts}
+            caption={`ตัวอย่าง A4 · ${useGaruda && garuda ? "ใส่ภาพตราครุฑแล้ว" : "ตราครุฑเว้นว่าง"} · สีแดง = ยังขาด (ตอนพิมพ์เป็นสีดำ)`}
+          />
         </div>
       </div>
     </div>

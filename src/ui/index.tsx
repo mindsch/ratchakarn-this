@@ -1,5 +1,5 @@
 // Shared v3 components. Props mirror the Figma components (🧩 Components page). Styles live in src/styles/ui.css.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode, type RefObject } from "react";
 import { pageCss, renderInner } from "../lib/doc/html";
 import { buildBlocks, PROFILES, type RenderOptions } from "../lib/doc/layout";
 import type { DocData } from "../lib/doc/types";
@@ -177,9 +177,9 @@ export function FieldRow({
       {status === "skipped" ? (
         <span className="frow-value skipped">[ระบุ...]</span>
       ) : block ? (
-        <textarea className="textarea" rows={3} value={value} placeholder={hint ?? "พิมพ์ หรือกดข้าม"} onChange={(e) => onChange(e.target.value)} autoFocus={autoFocus} style={{ minHeight: 0 }} />
+        <textarea className="textarea" rows={3} value={value} placeholder={hint ?? "พิมพ์ หรือกดข้าม"} aria-label={label} onChange={(e) => onChange(e.target.value)} autoFocus={autoFocus} style={{ minHeight: 0 }} />
       ) : (
-        <input className="input" value={value} placeholder={hint ?? "พิมพ์ หรือกดข้าม"} onChange={(e) => onChange(e.target.value)} autoFocus={autoFocus} />
+        <input className="input" value={value} placeholder={hint ?? "พิมพ์ หรือกดข้าม"} aria-label={label} onChange={(e) => onChange(e.target.value)} autoFocus={autoFocus} />
       )}
       <span className="frow-actions">
         {status === "empty" && onSkip && (
@@ -250,9 +250,9 @@ export function Tabs<T extends string>({ items, value, onChange }: { items: { va
 
 /* ---------- Banner (retro chrome; tone only on the tiny tag) ---------- */
 const BANNER_CHIP: Record<string, string> = { info: "INFO", warning: "WARN", success: "DONE", danger: "ERR" };
-export function Banner({ tone, children, onClose }: { tone: "info" | "warning" | "success" | "danger"; children: ReactNode; onClose?: () => void }) {
+export function Banner({ tone, children, onClose, standard = false }: { tone: "info" | "warning" | "success" | "danger"; children: ReactNode; onClose?: () => void; standard?: boolean }) {
   return (
-    <div className="banner" role={tone === "danger" ? "alert" : "status"}>
+    <div className={cx("banner", standard && "standard")} role={tone === "danger" ? "alert" : "status"}>
       <span className="chip">{BANNER_CHIP[tone]}</span>
       <span className="msg">{children}</span>
       {onClose && (
@@ -264,11 +264,56 @@ export function Banner({ tone, children, onClose }: { tone: "info" | "warning" |
   );
 }
 
+/** Move focus into an overlay, keep Tab inside it, and restore focus on close. */
+export function useDialogFocus(open: boolean, ref: RefObject<HTMLElement | null>, onClose?: () => void) {
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+  useEffect(() => {
+    if (!open) return;
+    const previous = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const focusable = () =>
+      [...(ref.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), textarea:not([disabled]), select:not([disabled]), [href], [tabindex]:not([tabindex="-1"])') ?? [])].filter(
+        (el) => !el.hidden && el.getAttribute("aria-hidden") !== "true",
+      );
+    requestAnimationFrame(() => (focusable()[0] ?? ref.current)?.focus());
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && closeRef.current) {
+        e.preventDefault();
+        closeRef.current();
+        return;
+      }
+      if (e.key !== "Tab") return;
+      const items = focusable();
+      if (!items.length) {
+        e.preventDefault();
+        ref.current?.focus();
+        return;
+      }
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      previous?.focus();
+    };
+  }, [open, ref]);
+}
+
 /* ---------- Pop-up (retro window) ---------- */
 export function Popup({ title, children, actions, onClose }: { title: string; children: ReactNode; actions?: ReactNode; onClose?: () => void }) {
+  const dialog = useRef<HTMLDivElement>(null);
+  useDialogFocus(true, dialog, onClose);
   return (
-    <div className="scrim" role="dialog" aria-modal aria-label={title}>
-      <div className="window">
+    <div className="scrim">
+      <div className="window" ref={dialog} role="dialog" aria-modal="true" aria-label={title} tabIndex={-1}>
         <div className="window-title">
           <span>{title}</span>
           {onClose && (
@@ -296,17 +341,13 @@ export function Progress({ value }: { value: number }) {
 
 /* ---------- Drawer ---------- */
 export function Drawer({ open, onClose, children, label }: { open: boolean; onClose: () => void; children: ReactNode; label: string }) {
-  useEffect(() => {
-    if (!open) return;
-    const k = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", k);
-    return () => window.removeEventListener("keydown", k);
-  }, [open, onClose]);
+  const drawer = useRef<HTMLElement>(null);
+  useDialogFocus(open, drawer, onClose);
   if (!open) return null;
   return (
     <>
       <div className="drawer-scrim" onClick={onClose} />
-      <aside className="drawer" role="dialog" aria-modal aria-label={label}>
+      <aside ref={drawer} className="drawer" role="dialog" aria-modal="true" aria-label={label} tabIndex={-1}>
         {children}
       </aside>
     </>
@@ -327,7 +368,7 @@ export function Paper({ doc, options, width = 520, caption }: { doc: DocData; op
     ro.observe(el);
     return () => ro.disconnect();
   }, [width]);
-  const opts: RenderOptions = useMemo(() => ({ profile: PROFILES.common, thaiDigits: false, garudaImage: null, showSlotHint: true, ...options }), [options]);
+  const opts: RenderOptions = useMemo(() => ({ profile: PROFILES.common, thaiDigits: false, garudaImage: null, showSlotHint: false, ...options }), [options]);
   const html = useMemo(() => markMissing(renderInner(buildBlocks(doc, opts), opts, true)), [doc, opts]);
   const m = opts.profile.marginsCm;
   const scale = w / A4_PX;

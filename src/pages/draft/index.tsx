@@ -51,7 +51,7 @@ let saved: Saved = { type: "หนังสือภายนอก", purposeId:
 
 const factsKey = (d: Draft) => JSON.stringify([d.values, d.lists]);
 const inputOf = (d: Draft): Input => ({
-  values: d.values,
+  values: Object.fromEntries(Object.entries(d.values).filter(([k]) => !d.skipped[k])),
   lists: d.lists,
   meta: Object.fromEntries(Object.entries(d.meta).filter(([k]) => !d.skipped[k])),
 });
@@ -202,7 +202,7 @@ export function DraftPage() {
                   {t.sentence.map((para, i) => (
                     <p key={i}>
                       {para.map((p, j) => (
-                        <PartView key={j} part={p} t={t} values={draft.values} onChange={setValue} />
+                        <PartView key={j} part={p} t={t} values={draft.values} skipped={draft.skipped} onChange={setValue} onSkip={setSkip} />
                       ))}
                     </p>
                   ))}
@@ -214,7 +214,16 @@ export function DraftPage() {
                 <Card key={sec.title} title={sec.title} count={`ขาด ${prog.sections[si][1] - prog.sections[si][0]} จาก ${prog.sections[si][1]}`}>
                   <div className="rows">
                     {sec.slots.map((x) => (
-                      <FieldRow key={x.key} label={x.question.replace(/ \(.*\)$/, "")} value={draft.values[x.key] ?? ""} status={(draft.values[x.key] ?? "").trim() ? "filled" : "empty"} hint={x.example} onChange={(v) => setValue(x.key, v)} />
+                      <FieldRow
+                        key={x.key}
+                        label={x.question.replace(/ \(.*\)$/, "")}
+                        value={draft.values[x.key] ?? ""}
+                        status={draft.skipped[x.key] ? "skipped" : (draft.values[x.key] ?? "").trim() ? "filled" : "empty"}
+                        hint={x.example}
+                        onChange={(v) => setValue(x.key, v)}
+                        onSkip={() => setSkip(x.key, true)}
+                        onUnskip={() => setSkip(x.key, false)}
+                      />
                     ))}
                   </div>
                   {sec.list && <ListEditor list={sec.list} rows={draft.lists[sec.list.key] ?? emptyRows(sec.list)} onChange={(r) => setRows(sec.list!, r)} />}
@@ -287,22 +296,33 @@ function CourtNote() {
   );
 }
 
-function PartView({ part, t, values, onChange }: { part: Part; t: Template; values: Record<string, string>; onChange: (k: string, v: string) => void }) {
+function PartView({ part, t, values, skipped, onChange, onSkip }: { part: Part; t: Template; values: Record<string, string>; skipped: Record<string, boolean>; onChange: (k: string, v: string) => void; onSkip: (k: string, on: boolean) => void }) {
   if (typeof part === "string") return <>{part}</>;
   if ("head" in part) return <span className="muted">{`{${part.head}}`}</span>;
   const slot = allSlots(t).find((s) => s.key === part.slot);
   if (!slot) return null;
   const v = values[slot.key] ?? "";
   const w = Math.max(8, (v || slot.short).length * 0.8 + 2);
+  if (skipped[slot.key]) {
+    return (
+      <span className="inline-field skipped">
+        [ระบุ...]
+        <button type="button" className="inline-skip" onClick={() => onSkip(slot.key, false)} aria-label={`เลิกข้าม ${slot.question}`}>เลิกข้าม</button>
+      </span>
+    );
+  }
   return (
-    <input
-      className={"blank-in" + (v.trim() ? "" : " miss")}
-      value={v}
-      placeholder={slot.short}
-      aria-label={slot.question}
-      style={{ width: `${w}ch` }}
-      onChange={(e) => onChange(slot.key, e.target.value)}
-    />
+    <span className="inline-field">
+      <input
+        className={"blank-in" + (v.trim() ? "" : " miss")}
+        value={v}
+        placeholder={slot.short}
+        aria-label={slot.question}
+        style={{ width: `${w}ch` }}
+        onChange={(e) => onChange(slot.key, e.target.value)}
+      />
+      {!v.trim() && <button type="button" className="inline-skip" onClick={() => onSkip(slot.key, true)} aria-label={`ข้าม ${slot.question}`}>ข้าม</button>}
+    </span>
   );
 }
 
@@ -411,7 +431,7 @@ function AiPrefill({ t, court, values, onFill }: { t: Template; court: boolean; 
               </Button>
             )}
           </div>
-          {msg && <Banner tone={msg.tone} onClose={() => setMsg(null)}>{msg.text}</Banner>}
+          {msg && <Banner tone={msg.tone} onClose={() => setMsg(null)} standard={court}>{msg.text}</Banner>}
         </div>
       )}
     </section>
@@ -481,7 +501,7 @@ function AiBody(props: {
           </Button>
         </div>
       )}
-      {msg && <Banner tone={msg.tone} onClose={() => setMsg(null)}>{msg.text}</Banner>}
+      {msg && <Banner tone={msg.tone} onClose={() => setMsg(null)} standard={court}>{msg.text}</Banner>}
       <div className="actions sticky-mobile d-actions">
         <Button variant="ghost" onClick={onBack}>
           ← เปลี่ยนชนิด

@@ -495,6 +495,7 @@ function courtBase(i: Input, sl: Record<string, Slot>, kind: "ฟ้อง" | "�
   const v = (k: string) => val(i.values, k);
   const head: Record<string, string> = {
     ศาล: v("court") || blank(sl.court.short),
+    คดีหมายเลขดำที่: val(i.meta, "คดีหมายเลขดำที่"),
     วันที่: val(i.meta, "วันที่"),
     โจทก์: v("pName"),
     จำเลย: v("dName"),
@@ -505,7 +506,10 @@ function courtBase(i: Input, sl: Record<string, Slot>, kind: "ฟ้อง" | "�
 }
 
 function courtMeta(): MetaField[] {
-  return [{ key: "วันที่", group: "head", label: "วันที่", hint: "เช่น 5 ธันวาคม 2569" }];
+  return [
+    { key: "คดีหมายเลขดำที่", group: "head", label: "คดีหมายเลขดำที่", hint: "เช่น ล1234/2569 · ถ้ายังไม่มีให้กดข้าม" },
+    { key: "วันที่", group: "head", label: "วันที่", hint: "เช่น 5 ธันวาคม 2569" },
+  ];
 }
 
 const COURT_SUE: Template = (() => {

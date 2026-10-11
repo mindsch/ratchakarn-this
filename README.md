@@ -1,4 +1,4 @@
-# ราชการนี้ · Ratchakarn-this
+# แปลเป็นราชการ · Ratchakarn-this
 
 เขียนภาษาราชการ ร่างหนังสือราชการ และออกเป็น DOCX/PDF ที่พิมพ์ใช้ได้จริง
 Turn plain text (Thai, English, any language) into Thai ราชการ register, draft official Thai documents, and export them as DOCX/PDF.
