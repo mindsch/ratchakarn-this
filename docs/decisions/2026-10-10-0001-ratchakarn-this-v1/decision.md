@@ -68,7 +68,7 @@ Real weight fine-tuning (Typhoon 2.5 4B / Qwen3-class) is wanted but **not in th
 - Exact positions of ที่ / วันที่ / เรื่อง / เรียน / อ้างถึง / สิ่งที่ส่งมาด้วย for the DOCX (Silpakorn manual aligns them to ครุฑ letters; need template DOCX/PDF from the sources in `references.md`).
 - Labour court: the templates are legacy-encoded .doc form-fillable files; the page states no paper/font/copies/fees rules. Match the template look (convert .doc → PDF in LibreOffice/Word to copy layout, fonts, spacing). Confirm filing rules with the court (lbphkc@coj.go.th) or its other pages. Other courts: do later, one at a time, from each court's own forms.
 - Layout numbers are guidelines only (no regulation text exists, per the user), so present them as common practice with selectable profiles.
-- Read the เครื่องหมายครุฑพ่าห์ Act before anyone markets the garuda upload feature widely.
+- เครื่องหมายครุฑพ่าห์ Act: read 2026-10-10 (see references.md). Key point is ม.13: using the garuda without the right, to make others believe you have it, is an offence (up to 1 year / 6,000 baht). Still unread: the royal decree under ม.7 (who may use it) and the 1992 amendment. Until then the app keeps its current stance (no bundled image, empty slot, user supplies image and is warned) and the upload should carry a clear "only if you are entitled to use it" warning, ideally a required confirmation.
 - Hosting choice (Vercel vs Cloudflare) and repo name/licence file.
 
 ## Next step

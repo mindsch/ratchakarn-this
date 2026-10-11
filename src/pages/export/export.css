@@ -1,0 +1,15 @@
+/* Export step: tokens only. */
+.xp-opts { display: flex; flex-direction: column; gap: 8px; }
+.xp-digits { display: flex; align-items: center; justify-content: space-between; padding-top: 4px; font-size: 15px; }
+.xp-note { font-size: 13px; color: var(--color-text-muted); }
+.xp-danger { color: var(--color-text-danger); font-weight: 600; }
+.xp-check { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 12px 0; }
+.xp-check-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.xp-check-title { font-weight: 500; }
+.xp-check-hint { font-size: 13px; color: var(--color-text-muted); }
+.xp-upload { display: flex; align-items: center; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+.xp-file-input { width: min(320px, 100%); padding: 4px; font-size: 13px; cursor: pointer; }
+.xp-file-input::file-selector-button { min-height: 36px; margin-right: 10px; padding: 6px 12px; border: 0; border-radius: 6px;
+  background: var(--color-action-tertiary-bg); color: var(--color-action-tertiary-text); font: inherit; font-weight: 500; cursor: pointer; }
+.xp-legal-note { margin-top: 8px; padding: 10px 12px; border-radius: var(--radius-control); background: var(--color-feedback-warning-bg);
+  color: var(--color-feedback-warning-text); font-size: 13px; line-height: 1.6; }
