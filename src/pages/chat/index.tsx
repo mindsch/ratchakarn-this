@@ -74,7 +74,15 @@ export function ChatPage() {
     setBusy(true);
     const ac = new AbortController();
     abort.current = ac;
-    const cfg = { kind: settings.kind, baseUrl: settings.baseUrl, apiKey: settings.apiKey, model: settings.model };
+    const cfg = {
+      kind: settings.kind,
+      baseUrl: settings.baseUrl,
+      apiKey: settings.apiKey,
+      model: settings.model,
+      maxTokens: 2048,
+      temperature: 0.6,
+      repetitionPenalty: settings.presetId === "typhoon" ? 1.05 : undefined,
+    };
     const setLast = (fn: (m: UiMsg) => UiMsg) => setMsgs((cur) => cur.map((m, i) => (i === cur.length - 1 ? fn(m) : m)));
     try {
       const tools = settings.kind === "openai" && settings.mcp.some((m) => m.url) ? await bindings(settings) : [];

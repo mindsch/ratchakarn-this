@@ -130,8 +130,8 @@ export async function buildDocx(blocks: Block[], opts: RenderOptions, title: str
   const f = opts.profile.fontFamily;
   const doc = new Document({
     title,
-    creator: "ราชการนี้ (Ratchakarn-this)",
-    description: "ร่างเอกสาร สร้างโดย ราชการนี้ ผู้ใช้ต้องตรวจทานก่อนใช้จริง",
+    creator: "แปลเป็นราชการ (Ratchakarn-this)",
+    description: "ร่างเอกสาร สร้างโดย แปลเป็นราชการ ผู้ใช้ต้องตรวจทานก่อนใช้จริง",
     styles: {
       default: {
         document: {

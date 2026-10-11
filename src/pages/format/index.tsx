@@ -155,6 +155,11 @@ export function FormatPage() {
   };
 
   const type = docState.doc.type;
+  const changeType = (nextType: string) => {
+    if (nextType === type) return;
+    if (!window.confirm("การเปลี่ยนชนิดเอกสารจะจัดข้อมูลใหม่จากข้อความต้นฉบับ การแก้ไขช่อง การข้าม และการจัดข้อความที่ยังไม่ได้จัดจะหายไป ดำเนินการต่อหรือไม่?")) return;
+    sortNow(nextType);
+  };
   const keys = fieldKeys(type);
   const miss = missingKeys(docState.doc, docState.status);
   const required = keys.filter((k) => !isOptionalField(k));
@@ -345,7 +350,7 @@ export function FormatPage() {
               title="ช่องเอกสาร"
               right={
                 isTemplateBlob(docState.raw ?? "") ? undefined : (
-                  <select className="input select fm-select" aria-label="ชนิดเอกสาร" value={type} onChange={(e) => sortNow(e.target.value)}>
+                  <select className="input select fm-select" aria-label="ชนิดเอกสาร" value={type} onChange={(e) => changeType(e.target.value)}>
                     {Object.entries(DOC_TYPES).map(([k, v]) => (
                       <option key={k} value={k}>
                         {v.label}

@@ -1,5 +1,5 @@
 import type { ChatMsg, ProviderConfig } from "./providers";
-import { LlmError } from "./providers";
+import { checkResponse, generationParams, LlmError, truncatedError } from "./providers";
 import type { McpClient, McpTool } from "./mcp";
 
 export interface ToolBinding {
@@ -33,10 +33,12 @@ export async function chatWithTools(
       method: "POST",
       signal,
       headers: { "Content-Type": "application/json", ...(cfg.apiKey ? { Authorization: `Bearer ${cfg.apiKey}` } : {}) },
-      body: JSON.stringify({ model: cfg.model, messages: convo, tools: defs }),
+      body: JSON.stringify({ model: cfg.model, ...generationParams(cfg), messages: convo, tools: defs }),
     });
-    if (!res.ok) throw new LlmError(`ผู้ให้บริการตอบ ${res.status}: ${(await res.text()).slice(0, 300)}`);
-    const msg = (await res.json()).choices?.[0]?.message;
+    await checkResponse(res);
+    const choice = (await res.json()).choices?.[0];
+    if (choice?.finish_reason === "length") throw truncatedError();
+    const msg = choice?.message;
     if (!msg) throw new LlmError("ไม่มีคำตอบ");
     const calls = msg.tool_calls as Array<{ id: string; function: { name: string; arguments: string } }> | undefined;
     if (!calls?.length) return msg.content ?? "";

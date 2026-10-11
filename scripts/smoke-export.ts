@@ -15,7 +15,7 @@ for (const [type, raw] of Object.entries(SAMPLES)) {
   const again = parseDoc(serializeDoc(doc));
   const norm = (d: typeof doc) => JSON.stringify([d.type, Object.entries(d.head).sort(), d.body, Object.entries(d.foot).sort()]);
   if (norm(again) !== norm(doc)) { console.error("round trip differs", type); failed++; }
-  const opts = { profile: PROFILES.common, thaiDigits: false, garudaImage: null, showSlotHint: true };
+  const opts = { profile: PROFILES.common, thaiDigits: false, garudaImage: null, showSlotHint: false };
   const blob = await buildDocx(buildBlocks(doc, opts), opts, type);
   const buf = Buffer.from(await blob.arrayBuffer());
   writeFileSync(`${out}/${type}.docx`, buf);

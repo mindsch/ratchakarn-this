@@ -7,7 +7,15 @@ export const aiReady = (s: Settings) => !!(s.model.trim() && s.baseUrl.trim() &&
 
 /** Send one user message with a system prompt and return the whole reply. Throws LlmError on failure. */
 export async function runAi(s: Settings, system: string, user: string, signal?: AbortSignal): Promise<string> {
-  const cfg = { kind: s.kind, baseUrl: s.baseUrl, apiKey: s.apiKey, model: s.model };
+  const cfg = {
+    kind: s.kind,
+    baseUrl: s.baseUrl,
+    apiKey: s.apiKey,
+    model: s.model,
+    maxTokens: 2048,
+    temperature: 0.1,
+    repetitionPenalty: s.presetId === "typhoon" ? 1.05 : undefined,
+  };
   let out = "";
   for await (const chunk of streamChat(cfg, system, [{ role: "user", content: user }], signal)) out += chunk;
   return out;

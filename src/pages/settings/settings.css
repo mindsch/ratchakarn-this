@@ -2,6 +2,8 @@
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .pchip { border: 0; background: var(--color-action-tertiary-bg); color: var(--color-action-tertiary-text); border-radius: var(--radius-full); padding: 6px 14px; font-size: 13px; font-weight: 500; min-height: 32px; }
 .pchip.on { background: var(--color-action-primary-bg); color: var(--color-action-primary-text); }
+.current-provider { margin: 0; padding: 10px 12px; border-radius: var(--radius-control); background: var(--color-surface-muted); font-size: 13px; color: var(--color-text-muted); }
+.current-provider strong { color: var(--color-text-default); }
 .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .key-row { display: flex; align-items: flex-end; gap: 12px; }
 .key-row .field { flex: 1; min-width: 0; }
@@ -15,6 +17,7 @@
 .mcp-row { display: flex; flex-direction: column; gap: 8px; padding: 12px 0; border-top: 1px solid var(--color-border-subtle); }
 .dialog h2 { margin: 0; }
 @media (max-width: 900px) {
+  .pchip { min-height: 44px; }
   .grid2 { grid-template-columns: 1fr; }
   .key-row { flex-direction: column; align-items: stretch; }
   .test-row { flex-direction: column; align-items: flex-start; }

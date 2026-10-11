@@ -1,13 +1,13 @@
 // Settings (S01 58:809, XP on S03 58:901) and the first-run AI setup dialog (S02 58:998).
-import { useEffect, useState } from "react";
+import { useRef, useState } from "react";
 import { aiReady } from "../../lib/ai";
 import { useApp } from "../../lib/app";
 import { chrome } from "../../lib/copy";
 import { PRESETS } from "../../lib/llm/presets";
 import { McpClient, type McpTool } from "../../lib/llm/mcp";
 import { mcpCache } from "../../lib/mcpCache";
-import { Banner, Button, Card, PageHeader, StatusTag, TextInput, Toggle } from "../../ui";
-import { ProviderChips, useConnectionTest } from "./shared";
+import { Banner, Button, Card, PageHeader, StatusTag, TextInput, Toggle, useDialogFocus } from "../../ui";
+import { connectionFingerprint, ProviderChips, useConnectionTest } from "./shared";
 import "./settings.css";
 
 // Lines from prompts/disclaimer.md, minus the court line (no court row in this version).
@@ -75,7 +75,9 @@ export function SettingsPage() {
   const [test, runTest] = useConnectionTest();
   const preset = PRESETS.find((p) => p.id === settings.presetId);
   const ready = aiReady(settings);
-  const connected = ready && test.state !== "fail";
+  const fingerprint = connectionFingerprint(settings);
+  const currentTest = test.fingerprint === fingerprint;
+  const connected = ready && test.state === "ok" && currentTest;
 
   return (
     <div className="page">
@@ -113,7 +115,7 @@ export function SettingsPage() {
             </Button>
             <span className="t-body-s muted">คีย์ส่งตรงไปยังผู้ให้บริการที่คุณเลือก ไม่ผ่านเซิร์ฟเวอร์ของโครงการ</span>
           </div>
-          {test.msg && (
+          {test.msg && currentTest && (
             <p className={"test-result " + (test.state === "ok" ? "ok" : "danger")} role="status">
               {test.msg}
             </p>
@@ -166,12 +168,13 @@ const dismissed = () => {
   }
 };
 
-/** Shown once when no key is set; "ข้ามไปก่อน" dismisses it for good. Never on the settings page. */
+/** Shown once when AI is not ready; "ข้ามไปก่อน" dismisses it for good. Never on the settings page. */
 export function FirstRunDialog() {
-  const { route, hasKey, settings, updateSettings, go } = useApp();
+  const { route, settings, updateSettings, go } = useApp();
   const [gone, setGone] = useState(dismissed);
   const [test, runTest] = useConnectionTest();
   const [model, setModel] = useState(false);
+  const dialog = useRef<HTMLDivElement>(null);
 
   const close = () => {
     try {
@@ -181,15 +184,10 @@ export function FirstRunDialog() {
     }
     setGone(true);
   };
-  useEffect(() => {
-    if (!gone && !hasKey && route !== "settings") {
-      const onKey = (e: KeyboardEvent) => e.key === "Escape" && close();
-      window.addEventListener("keydown", onKey);
-      return () => window.removeEventListener("keydown", onKey);
-    }
-  }, [gone, hasKey, route]);
+  const open = !gone && route !== "settings";
+  useDialogFocus(open, dialog, close);
 
-  if (gone || hasKey || route === "settings") return null;
+  if (!open) return null;
   const needModel = !settings.model.trim();
   const save = async () => {
     if (needModel) {
@@ -200,8 +198,8 @@ export function FirstRunDialog() {
   };
 
   return (
-    <div className="scrim" role="dialog" aria-modal aria-labelledby="fr-title">
-      <div className="dialog">
+    <div className="scrim">
+      <div ref={dialog} className="dialog" role="dialog" aria-modal="true" aria-labelledby="fr-title" tabIndex={-1}>
         <div>
           <h2 id="fr-title" className="t-h-m">ตั้งค่า AI ก่อนเริ่มใช้</h2>
           <p className="muted">ใส่คีย์เพื่อใช้ปุ่ม AI ช่วยร่างและ AI ตรวจทั้งฉบับ</p>
@@ -210,15 +208,13 @@ export function FirstRunDialog() {
           <span className="field-label">ผู้ให้บริการ</span>
           <ProviderChips settings={settings} update={updateSettings} />
         </div>
-        <TextInput label="API key" type="password" autoComplete="off" value={settings.apiKey} onChange={(e) => updateSettings({ apiKey: e.target.value })} placeholder="วางคีย์ที่นี่" />
-        {(model || needModel) && settings.apiKey.trim() && (
-          <TextInput label="ชื่อโมเดล" value={settings.model} onChange={(e) => updateSettings({ model: e.target.value })} placeholder={PRESETS.find((p) => p.id === settings.presetId)?.modelHint} error={model && needModel ? "ใส่ชื่อโมเดลก่อน" : undefined} />
-        )}
+        <TextInput label="API key" type="password" autoComplete="off" value={settings.apiKey} onChange={(e) => updateSettings({ apiKey: e.target.value })} placeholder={settings.presetId === "ollama" ? "Ollama ไม่ต้องใส่คีย์" : "วางคีย์ที่นี่"} />
+        <TextInput label="ชื่อโมเดล" value={settings.model} onChange={(e) => updateSettings({ model: e.target.value })} placeholder={PRESETS.find((p) => p.id === settings.presetId)?.modelHint} error={model && needModel ? "ใส่ชื่อโมเดลก่อน" : undefined} />
         <p className="t-body-s muted">คีย์เก็บไว้ในเบราว์เซอร์นี้เท่านั้น ส่งตรงไปยังผู้ให้บริการ ไม่ผ่านเซิร์ฟเวอร์ของโครงการ</p>
         {test.state === "fail" && <p className="t-body-s danger" role="alert">{test.msg} <button type="button" className="link" onClick={() => { close(); go("settings"); }}>ไปหน้าตั้งค่า</button></p>}
         <div className="spread">
           <Button variant="secondary" onClick={close}>ข้ามไปก่อน</Button>
-          <Button variant="primary" onClick={save} disabled={!settings.apiKey.trim() || test.state === "busy"}>
+          <Button variant="primary" onClick={save} disabled={!aiReady(settings) || test.state === "busy"}>
             {test.state === "busy" ? "กำลังทดสอบ…" : "บันทึกและทดสอบ"}
           </Button>
         </div>
