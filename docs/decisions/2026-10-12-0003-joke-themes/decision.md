@@ -1,6 +1,6 @@
 # 0003 — Joke themes (XP / ราชการไทย / TH-AI Passport)
 
-**Status:** Built 2026-10-12, not committed. Default look verified unchanged (see "What got built"). See `plan.md`.
+**Status:** Built 2026-10-12, committed on build-0002 (10a29bd, together with the 0002 model-picker follow-ups). Default look verified unchanged (see "What got built"). See `plan.md`.
 **Date:** 2026-10-12
 **Supersedes:** the chrome-only `[data-theme="xp"]` / "โหมด XP replica" from 0002 (XP becomes one of four full themes). Everything else in 0002 stands.
 

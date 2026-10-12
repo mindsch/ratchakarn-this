@@ -45,3 +45,7 @@ Input hints (`modelHint`) were updated to match.
 
 - Model names are hard-coded and will go stale; a "last checked" date in settings was suggested, not built.
 - Existing saved settings keep their model; only new/unsaved providers get the prefill.
+
+## Status
+
+Committed on build-0002 in `10a29bd` together with the 0003 joke themes, then pushed. Lists later expanded: OpenAI 16, Gemini 9, Ollama 19, OpenRouter 22 models (see `src/lib/llm/presets.ts`).
