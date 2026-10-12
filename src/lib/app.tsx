@@ -1,8 +1,9 @@
-// App-wide state: route, settings (BYOK), โหมด XP replica, and the shared document (Draft and Format both end in Export).
+// App-wide state: route, settings (BYOK), theme, and the shared document (Draft and Format both end in Export).
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { DocData } from "./doc/types";
 import { DEFAULT_TYPE } from "./doc/types";
 import { useSettings, type Settings } from "./settings";
+import { loadTheme, saveTheme, type Theme } from "./theme";
 
 export type Route = "chat" | "draft" | "format" | "prompts" | "settings";
 const ROUTES: Route[] = ["chat", "draft", "format", "prompts", "settings"];
@@ -56,25 +57,11 @@ export function finalDoc(s: DocState): DocData {
   };
 }
 
-/* ---------- โหมด XP replica (chrome only, persisted) ---------- */
-const XP_KEY = "ratchakarn.xp.v1";
-function useXpMode(): [boolean, (v: boolean) => void] {
-  const [xp, setXp] = useState(() => {
-    try {
-      return localStorage.getItem(XP_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
-  useEffect(() => {
-    document.documentElement.dataset.theme = xp ? "xp" : "standard";
-    try {
-      localStorage.setItem(XP_KEY, xp ? "1" : "0");
-    } catch {
-      /* private mode: setting lasts for this tab only */
-    }
-  }, [xp]);
-  return [xp, setXp];
+/* ---------- Theme (standard | xp | gov | aipass, persisted) ---------- */
+function useTheme(): [Theme, (t: Theme) => void] {
+  const [theme, setTheme] = useState<Theme>(loadTheme);
+  useEffect(() => saveTheme(theme), [theme]);
+  return [theme, setTheme];
 }
 
 /* ---------- Route (hash, so reload keeps the page) ---------- */
@@ -89,8 +76,10 @@ interface AppCtx {
   settings: Settings;
   updateSettings: (p: Partial<Settings>) => void;
   hasKey: boolean;
+  theme: Theme;
+  setTheme: (t: Theme) => void;
+  /** the XP theme only: it also switches the banner/pop-up jokes in lib/copy.ts */
   xp: boolean;
-  setXp: (v: boolean) => void;
   docState: DocState;
   setDocState: (s: DocState | ((p: DocState) => DocState)) => void;
 }
@@ -100,7 +89,8 @@ const Ctx = createContext<AppCtx | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [route, setRoute] = useState<Route>(readRoute);
   const [settings, updateSettings] = useSettings();
-  const [xp, setXp] = useXpMode();
+  const [theme, setTheme] = useTheme();
+  const xp = theme === "xp";
   const [docState, setDocState] = useState<DocState>(() => emptyDoc());
 
   useEffect(() => {
@@ -115,8 +105,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ route, go, settings, updateSettings, hasKey: !!settings.apiKey.trim(), xp, setXp, docState, setDocState }),
-    [route, go, settings, updateSettings, xp, setXp, docState],
+    () => ({ route, go, settings, updateSettings, hasKey: !!settings.apiKey.trim(), theme, setTheme, xp, docState, setDocState }),
+    [route, go, settings, updateSettings, theme, setTheme, xp, docState],
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }

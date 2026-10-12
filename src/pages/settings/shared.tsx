@@ -1,8 +1,9 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { runAi } from "../../lib/ai";
 import { PRESETS } from "../../lib/llm/presets";
 import { LlmError } from "../../lib/llm/providers";
 import { providerPatch, type Settings } from "../../lib/settings";
+import { TextInput } from "../../ui";
 
 const SHORT: Record<string, string> = { thaillm: "ThaiLLM", typhoon: "Typhoon", ollama: "Ollama", openrouter: "OpenRouter", openai: "OpenAI", anthropic: "Claude", gemini: "Gemini", custom: "กำหนดเอง" };
 
@@ -67,4 +68,54 @@ export function useConnectionTest() {
     }
   };
   return [t, run] as const;
+}
+
+const CUSTOM_MODEL = "__custom";
+
+/** Dropdown of suggested models for the provider, plus a typed name for anything else. */
+export function ModelPicker({ settings, update, error }: { settings: Settings; update: (patch: Partial<Settings>) => void; error?: string }) {
+  const preset = PRESETS.find((p) => p.id === settings.presetId);
+  const models = preset?.models ?? [];
+  const [typing, setTyping] = useState(false);
+  useEffect(() => setTyping(false), [settings.presetId]);
+  const custom = models.length === 0 || typing || (settings.model !== "" && !models.includes(settings.model));
+  return (
+    <div className="stack" style={{ gap: 8 }}>
+      {models.length > 0 && (
+        <label className="field">
+          <span className="field-label">ชื่อโมเดล</span>
+          <select
+            className="input"
+            value={custom ? CUSTOM_MODEL : settings.model}
+            onChange={(e) => {
+              if (e.target.value === CUSTOM_MODEL) {
+                setTyping(true);
+                update({ model: "" });
+              } else {
+                setTyping(false);
+                update({ model: e.target.value });
+              }
+            }}
+          >
+            {models.map((m) => (
+              <option key={m} value={m}>
+                {m}
+              </option>
+            ))}
+            <option value={CUSTOM_MODEL}>อื่นๆ (พิมพ์ชื่อเอง)</option>
+          </select>
+        </label>
+      )}
+      {custom && (
+        <TextInput
+          label={models.length === 0 ? "ชื่อโมเดล" : undefined}
+          aria-label="ชื่อโมเดล"
+          value={settings.model}
+          onChange={(e) => update({ model: e.target.value })}
+          placeholder={preset?.modelHint}
+          error={error}
+        />
+      )}
+    </div>
+  );
 }

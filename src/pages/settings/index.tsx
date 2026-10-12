@@ -6,8 +6,9 @@ import { chrome } from "../../lib/copy";
 import { PRESETS } from "../../lib/llm/presets";
 import { McpClient, type McpTool } from "../../lib/llm/mcp";
 import { mcpCache } from "../../lib/mcpCache";
-import { Banner, Button, Card, PageHeader, StatusTag, TextInput, Toggle, useDialogFocus } from "../../ui";
-import { connectionFingerprint, ProviderChips, useConnectionTest } from "./shared";
+import { Banner, Button, Card, PageHeader, Segmented, StatusTag, TextInput, useDialogFocus } from "../../ui";
+import { THEMES } from "../../lib/theme";
+import { connectionFingerprint, ModelPicker, ProviderChips, useConnectionTest } from "./shared";
 import "./settings.css";
 
 // Lines from prompts/disclaimer.md, minus the court line (no court row in this version).
@@ -69,7 +70,7 @@ function Advanced() {
 }
 
 export function SettingsPage() {
-  const { settings, updateSettings, xp, setXp } = useApp();
+  const { settings, updateSettings, theme, setTheme } = useApp();
   const [show, setShow] = useState(false);
   const [saved, setSaved] = useState(false);
   const [test, runTest] = useConnectionTest();
@@ -102,7 +103,7 @@ export function SettingsPage() {
           </div>
           <div className="grid2">
             <TextInput label="Base URL" value={settings.baseUrl} onChange={(e) => updateSettings({ baseUrl: e.target.value })} placeholder="https://.../v1" />
-            <TextInput label="ชื่อโมเดล" value={settings.model} onChange={(e) => updateSettings({ model: e.target.value })} placeholder={preset?.modelHint} />
+            <ModelPicker settings={settings} update={updateSettings} />
           </div>
           <label className="check-row">
             <input type="checkbox" checked={settings.rememberKey} onChange={(e) => updateSettings({ rememberKey: e.target.checked })} />
@@ -125,23 +126,22 @@ export function SettingsPage() {
         </Card>
 
         <Card title="การแสดงผล">
-          <div className="spread">
-            <div>
-              <div className="t-label-m">โหมด XP replica</div>
-              <div className="t-body-s muted">เปลี่ยนเฉพาะแบนเนอร์และป๊อปอัป ไม่แตะเอกสาร</div>
-            </div>
-            <Toggle
-              label="โหมด XP replica"
-              checked={xp}
-              onChange={(v) => {
-                setXp(v);
-                setSaved(true);
-              }}
-            />
+          <div>
+            <div className="t-label-m">ธีม</div>
+            <div className="t-body-s muted">เปลี่ยนหน้าตาเว็บเป็นเรื่องสนุก ไม่แตะเอกสารที่ส่งออก</div>
           </div>
+          <Segmented
+            label="ธีม"
+            options={THEMES.map((t) => ({ value: t.id, label: t.label }))}
+            value={theme}
+            onChange={(v) => {
+              setTheme(v);
+              setSaved(true);
+            }}
+          />
           {saved && (
             <Banner tone="success" onClose={() => setSaved(false)}>
-              {chrome("saved", xp)}
+              {chrome("saved", theme === "xp")}
             </Banner>
           )}
         </Card>
@@ -209,7 +209,7 @@ export function FirstRunDialog() {
           <ProviderChips settings={settings} update={updateSettings} />
         </div>
         <TextInput label="API key" type="password" autoComplete="off" value={settings.apiKey} onChange={(e) => updateSettings({ apiKey: e.target.value })} placeholder={settings.presetId === "ollama" ? "Ollama ไม่ต้องใส่คีย์" : "วางคีย์ที่นี่"} />
-        <TextInput label="ชื่อโมเดล" value={settings.model} onChange={(e) => updateSettings({ model: e.target.value })} placeholder={PRESETS.find((p) => p.id === settings.presetId)?.modelHint} error={model && needModel ? "ใส่ชื่อโมเดลก่อน" : undefined} />
+        <ModelPicker settings={settings} update={updateSettings} error={model && needModel ? "ใส่ชื่อโมเดลก่อน" : undefined} />
         <p className="t-body-s muted">คีย์เก็บไว้ในเบราว์เซอร์นี้เท่านั้น ส่งตรงไปยังผู้ให้บริการ ไม่ผ่านเซิร์ฟเวอร์ของโครงการ</p>
         {test.state === "fail" && <p className="t-body-s danger" role="alert">{test.msg} <button type="button" className="link" onClick={() => { close(); go("settings"); }}>ไปหน้าตั้งค่า</button></p>}
         <div className="spread">
