@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Joke themes: brand and CI</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=Trirong:wght@600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Thai+Looped:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root { --ink:#1B1B1F; --muted:#5C5C64; --line:#DCDCE0; --canvas:#F6F6F7; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--canvas); color:var(--ink); font:15px/1.55 "IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif; }
+.wrap { max-width:1180px; margin:0 auto; padding:40px 24px 80px; display:flex; flex-direction:column; gap:40px; }
+h1,h2,h3,p { margin:0; }
+h1 { font-size:30px; line-height:1.25; }
+h2 { font-size:22px; }
+h3 { font-size:13px; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); font-weight:600; margin-bottom:10px; }
+.lede { color:var(--muted); max-width:70ch; margin-top:8px; }
+.rules { display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:12px; }
+.rules > div { background:#fff; border-radius:12px; padding:16px 18px; }
+.rules b { display:block; margin-bottom:4px; }
+.theme { background:#fff; border-radius:16px; padding:28px; display:flex; flex-direction:column; gap:28px; }
+.theme-head { display:flex; flex-direction:column; gap:6px; }
+.theme-head .tag { font-size:12px; font-weight:600; letter-spacing:.06em; color:var(--muted); }
+.grid2 { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1.15fr); gap:28px; }
+@media (max-width:900px){ .grid2 { grid-template-columns:1fr; } }
+.scale { display:flex; flex-direction:column; gap:10px; }
+.scale-row { display:flex; flex-direction:column; gap:4px; }
+.scale-row .name { font-size:12px; color:var(--muted); font-weight:500; }
+.chips { display:flex; border-radius:8px; overflow:hidden; border:1px solid var(--line); }
+.chip { flex:1; height:36px; display:flex; align-items:flex-end; padding:2px 4px; font-size:9.5px; font-family:ui-monospace,Menlo,monospace; }
+.tokens { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:6px 14px; }
+.tok { display:flex; align-items:center; gap:8px; font-size:12px; min-width:0; }
+.tok i { flex:none; width:22px; height:22px; border-radius:5px; border:1px solid rgba(0,0,0,.15); }
+.tok span { min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.tok code, .kv code { font:11px ui-monospace,Menlo,monospace; color:var(--muted); }
+.kv { display:grid; grid-template-columns:140px 1fr; gap:6px 12px; font-size:13px; }
+.kv dt { color:var(--muted); font-weight:500; }
+.kv dd { margin:0; }
+.contrast { display:flex; flex-wrap:wrap; gap:6px; }
+.contrast span { font-size:11.5px; padding:2px 8px; border-radius:99px; background:#E4EEE9; color:#266245; font-weight:500; }
+.contrast span.bad { background:#F8E5E4; color:#A02C24; }
+.notes { margin:0; padding-left:18px; font-size:13.5px; color:var(--muted); }
+.notes li { margin:3px 0; }
+.stage { border-radius:12px; overflow:hidden; border:1px solid var(--line); }
+
+/* ===== themed demo: reads only semantic tokens, same names as src/styles/tokens.css ===== */
+.demo { background:var(--color-bg-default); color:var(--color-text-default); font-family:var(--font-ui); font-size:var(--font-size); line-height:var(--line-height); padding:0 0 22px; }
+.demo .nav { display:flex; align-items:center; gap:8px; padding:10px 16px; background:var(--nav-bg); color:var(--nav-text); border-bottom:var(--nav-border); }
+.demo .nav b { font-family:var(--font-display); font-size:16px; margin-right:auto; }
+.demo .pill { padding:5px 12px; border-radius:var(--radius-pill); font-size:13px; font-weight:500; border:1px solid transparent; color:var(--nav-text); }
+.demo .pill.sel { background:var(--nav-sel-bg); color:var(--nav-sel-text); }
+.demo .pill.out { border-color:var(--nav-text); }
+.demo .body { padding:18px 16px 0; display:flex; flex-direction:column; gap:14px; }
+.demo .page-title { font-family:var(--font-display); font-size:24px; font-weight:var(--display-weight); line-height:1.3; color:var(--color-text-title); text-shadow:var(--title-shadow); }
+.demo .card { background:var(--color-surface-default); border:var(--card-border); border-radius:var(--radius-card); box-shadow:var(--card-shadow); padding:14px 16px; display:flex; flex-direction:column; gap:10px; }
+.demo .card h4 { margin:0; font-size:16px; font-weight:600; font-family:var(--font-heading); }
+.demo .muted { color:var(--color-text-muted); font-size:13px; }
+.demo .row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+.demo .btn { border-radius:var(--radius-control); border:1px solid transparent; padding:7px 14px; font:inherit; font-weight:500; font-size:14px; min-height:36px; }
+.demo .btn.p { background:var(--color-action-primary-bg); color:var(--color-action-primary-text); border-color:var(--btn-p-border); box-shadow:var(--btn-p-shadow); }
+.demo .btn.s { background:var(--color-action-secondary-bg); color:var(--color-action-secondary-text); border-color:var(--color-action-secondary-border); box-shadow:var(--btn-s-shadow); }
+.demo .btn.t { background:var(--color-action-tertiary-bg); color:var(--color-action-tertiary-text); }
+.demo .btn.a { background:var(--color-action-accent-bg); color:var(--color-action-accent-text); border-color:var(--btn-a-border); }
+.demo .input { border:var(--input-border); border-radius:var(--radius-control); background:var(--input-bg); padding:7px 10px; font:inherit; font-size:14px; color:var(--color-text-default); width:100%; box-shadow:var(--input-shadow); }
+.demo .alerts { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
+.demo .al { border-radius:var(--radius-control); padding:8px 10px; font-size:13px; border:var(--alert-border); }
+.demo .al.ok { background:var(--color-feedback-success-bg); color:var(--color-feedback-success-text); }
+.demo .al.wn { background:var(--color-feedback-warning-bg); color:var(--color-feedback-warning-text); }
+.demo .al.er { background:var(--color-feedback-danger-bg); color:var(--color-feedback-danger-text); }
+.demo .al.in { background:var(--color-feedback-info-bg); color:var(--color-feedback-info-text); }
+.demo .progress { height:var(--progress-h); background:var(--color-chrome-progress-track); border:var(--progress-border); border-radius:var(--progress-radius); overflow:hidden; }
+.demo .progress > span { display:block; width:62%; height:100%; background:var(--progress-fill); }
+.demo .win { margin:0 16px; background:var(--color-chrome-window-bg); border:2px solid var(--color-chrome-window-border); border-radius:var(--chrome-window-radius); box-shadow:var(--chrome-shadow-x) var(--chrome-shadow-offset) var(--chrome-shadow-blur) var(--chrome-shadow-color); overflow:hidden; margin-top:16px; }
+.demo .win-title { display:flex; align-items:center; gap:8px; padding:5px 8px; background:var(--titlebar-bg); color:var(--color-chrome-titlebar-text); border-bottom:var(--titlebar-rule); font-family:var(--font-heading); font-weight:700; font-size:13px; }
+.demo .win-title em { margin-left:auto; display:flex; gap:3px; font-style:normal; }
+.demo .win-title em i { width:18px; height:18px; border-radius:var(--radius-ctl-btn); background:var(--color-chrome-window-control-bg); border:1px solid var(--color-chrome-window-control-border); }
+.demo .win-title em i.x { background:var(--ctl-close-bg); }
+.demo .win-body { padding:12px; display:flex; flex-direction:column; gap:8px; font-size:13.5px; }
+.demo .link { color:var(--color-text-link); text-decoration:underline; text-underline-offset:2px; }
+.demo .paper { background:#fff; color:#000; border-radius:0; box-shadow:0 1px 2px rgba(0,0,0,.08),0 6px 20px rgba(0,0,0,.08); font-family:"Sarabun",sans-serif; font-size:15px; padding:12px 16px; }
+.demo .desk { background:var(--color-bg-desk); padding:12px; border-radius:var(--radius-card); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>Joke themes: brand and CI</h1>
+  <p class="lede">Three full re-skins on the same semantic tokens as <code>src/styles/tokens.css</code>, so applying one is a token override plus a few component rules. Every swatch, table and sample below is generated from one token object per theme.</p>
+</header>
+
+<section class="rules">
+  <div><b>Re-skinned</b>App canvas, cards, nav, buttons, inputs, feedback, banners and pop-ups, type, radii, shadows.</div>
+  <div><b>Never re-skinned</b>The A4 paper. A ราชการ document must export identically in every theme (TH Sarabun New, white, black ink). The desk under it may change colour.</div>
+  <div><b>Mechanism</b><code>data-theme</code> on <code>&lt;html&gt;</code>: <code>default</code> · <code>xp</code> · <code>gov</code> · <code>aipass</code>. Saved in localStorage. The existing chrome-only <code>[data-theme="xp"]</code> becomes the full XP theme.</div>
+</section>
+
+<div id="themes" style="display:contents"></div>
+
+<section class="rules">
+  <div><b>Not used, on purpose</b>The ครุฑ emblem (legally restricted), the Windows logo and Bliss photo, the AI Pass logo and wordmark. Only colour, type and shape are borrowed, so the joke stays a parody and not an impersonation.</div>
+  <div><b>Open for you to decide</b>1) XP canvas: flat Luna blue (shown) or flat blue with a green Bliss hill at the bottom. 2) AI Pass: canvas stays flat grey (shown); the blue gradient panel is used only on banners and the export-done card, because the sky-gradient hero was rejected earlier. 3) Gov: Trirong on page titles only (shown) or Sarabun everywhere.</div>
+  <div><b>Source</b>AI Pass values are read from the live stylesheet at aipass.go.th (2026-10-12). They may change upstream; ours are copies, not links.</div>
+</section>
+</div>
+
+<script>
+const T = [
+{
+  id:'xp', cls:'t-xp', tag:'THEME 1 · โหมดวินโดว์ XP',
+  name:'Luna XP',
+  concept:'The whole site is a Windows XP desktop. Cards are dialog windows with blue gradient title bars, the nav is the taskbar, the default button is the blue one, tooltips and warnings are the yellow balloon, progress is green blocks.',
+  scales:[
+    ['Luna blue',['#DEE7FA','#CAD8F6','#A1BBF0','#799EE9','#5181E2','#2863DC','#0046D5','#0038AA','#002A80','#001C55']],
+    ['Face / beige',['#F5F3EB','#ECE9D8','#D7D4C5','#C2C0B2','#ADAB9E','#98968B','#838178','#6E6D65']],
+    ['Start green',['#E1F4E1','#A6DEA6','#57C157','#2FB22F','#279627','#207920','#185D18']],
+    ['Balloon / alert',['#FFFFE1','#FFF4CC','#FFD84D','#DDBB43','#FDE3E0','#E0472A','#A02C24']],
+  ],
+  vars:{
+    '--color-bg-default':'#2F62C0','--color-bg-desk':'#D7D4C5','--color-surface-default':'#ECE9D8','--color-text-title':'#FFFFFF',
+    '--color-text-default':'#111111','--color-text-muted':'#4A4A4A','--color-text-subtle':'#5E5E5E','--color-text-link':'#0046D5',
+    '--color-action-primary-bg':'#0046D5','--color-action-primary-text':'#FFFFFF','--color-action-secondary-bg':'#F5F3EB','--color-action-secondary-text':'#111111','--color-action-secondary-border':'#003C74',
+    '--color-action-tertiary-bg':'#D7D4C5','--color-action-tertiary-text':'#111111','--color-action-accent-bg':'#FFFFE1','--color-action-accent-text':'#111111',
+    '--color-feedback-success-bg':'#E1F4E1','--color-feedback-success-text':'#185D18','--color-feedback-warning-bg':'#FFFFE1','--color-feedback-warning-text':'#111111',
+    '--color-feedback-danger-bg':'#FDE3E0','--color-feedback-danger-text':'#A02C24','--color-feedback-info-bg':'#DEE7FA','--color-feedback-info-text':'#002A80',
+    '--color-chrome-titlebar-text':'#FFFFFF','--color-chrome-window-bg':'#ECE9D8','--color-chrome-window-border':'#0046D5','--color-chrome-window-control-bg':'#2863DC','--color-chrome-window-control-border':'#FFFFFF','--color-chrome-progress-track':'#FFFFFF',
+    '--chrome-shadow-color':'#00000073','--chrome-shadow-x':'2px','--chrome-shadow-offset':'3px','--chrome-shadow-blur':'8px','--chrome-window-radius':'8px',
+    '--radius-control':'3px','--radius-card':'8px','--radius-pill':'3px','--radius-ctl-btn':'3px','--progress-h':'16px','--progress-radius':'2px',
+    '--font-ui':'Tahoma,"Noto Sans Thai",sans-serif','--font-heading':'"Trebuchet MS",Tahoma,"Noto Sans Thai",sans-serif','--font-display':'"Trebuchet MS",Tahoma,"Noto Sans Thai",sans-serif','--font-size':'14px','--line-height':'1.5','--display-weight':'700',
+    '--nav-bg':'linear-gradient(180deg,#3168D5,#245EDC 40%,#1941A5)','--nav-text':'#FFFFFF','--nav-sel-bg':'#1E52B7','--nav-sel-text':'#FFFFFF','--nav-border':'1px solid #0B2F7A',
+    '--title-shadow':'1px 1px 0 #0A246A','--card-border':'1px solid #FFFFFF','--card-shadow':'inset -1px -1px 0 #ACA899, 2px 3px 8px #00000073',
+    '--btn-p-border':'#003C74','--btn-p-shadow':'inset 0 0 0 1px #5181E2','--btn-s-shadow':'inset 0 -2px 0 #D7D4C5','--btn-a-border':'#000000',
+    '--input-border':'1px solid #7F9DB9','--input-bg':'#FFFFFF','--input-shadow':'none','--alert-border':'1px solid #00000040',
+    '--progress-fill':'repeating-linear-gradient(90deg,#2FB22F 0 8px,transparent 8px 10px)','--progress-border':'1px solid #686868',
+    '--titlebar-bg':'linear-gradient(180deg,#3D8BFF 0%,#0058E6 45%,#0035A8 100%)','--titlebar-rule':'0','--ctl-close-bg':'#E0472A'
+  },
+  groups:[
+    ['Canvas & surface',['--color-bg-default','--color-bg-desk','--color-surface-default','--color-text-title']],
+    ['Text',['--color-text-default','--color-text-muted','--color-text-subtle','--color-text-link']],
+    ['Actions',['--color-action-primary-bg','--color-action-secondary-bg','--color-action-secondary-border','--color-action-tertiary-bg','--color-action-accent-bg']],
+    ['Feedback',['--color-feedback-success-bg','--color-feedback-warning-bg','--color-feedback-danger-bg','--color-feedback-info-bg']],
+    ['Chrome',['--color-chrome-window-border','--color-chrome-window-control-bg','--ctl-close-bg','--color-chrome-progress-track']],
+  ],
+  facts:[
+    ['Font','Tahoma (UI), Trebuchet MS bold (titles, falls back to Tahoma for Thai). Noto Sans Thai as web fallback. Body 14px.'],
+    ['Shape','Controls 3px · windows 8px · square-ish pills. Window: 2px blue border, gradient title bar, 3 control buttons (red close).'],
+    ['Depth','Hard bevel on buttons (inset 1px), window shadow 2px 3px 8px 45% black.'],
+    ['Focus & hover','Focus = 1px dotted black outline. Hover = orange inner ring #F5A930 on buttons.'],
+    ['Motion','None. Progress is 8px green blocks, not a smooth bar.'],
+    ['Voice','Optional strings: “Start”, “My Documents”, “This program has performed an illegal operation”.'],
+  ],
+  pairs:[['text on face','--color-text-default','--color-surface-default'],['muted on face','--color-text-muted','--color-surface-default'],['subtle on face','--color-text-subtle','--color-surface-default'],['white on primary','--color-action-primary-text','--color-action-primary-bg'],['link on face','--color-text-link','--color-surface-default'],['title on canvas','--color-text-title','--color-bg-default'],['success','--color-feedback-success-text','--color-feedback-success-bg'],['danger','--color-feedback-danger-text','--color-feedback-danger-bg'],['info','--color-feedback-info-text','--color-feedback-info-bg']],
+  nav:['Passport','Doc check','Export'], navTitle:'Start',
+  winTitle:'Export — Windows Explorer', demoTitle:'My Documents',
+},
+{
+  id:'gov', cls:'t-gov', tag:'THEME 2 · ราชการไทย',
+  name:'ราชการไทย — น้ำตาล / ครีม / เหลือง',
+  concept:'Formal Thai civil-service paper, in teak brown, cream and gold-leaf yellow. Square corners, double-rule frames, red vermilion reserved for the ตราประทับ stamp. Sarabun throughout, Trirong only on page titles.',
+  scales:[
+    ['Teak brown',['#F9F1E1','#F2E4CC','#E8D3B8','#D9B898','#C49470','#A8744A','#8A5A33','#6E4526','#53321B','#3A2212','#231409']],
+    ['Cream',['#FFFBF0','#FBF3DC','#F3E6C4','#E8D5A6']],
+    ['Gold leaf',['#F9E7A8','#F2D36B','#E7BC3A','#CFA02A','#A97E1C','#7F5E15']],
+    ['Vermilion / moss / indigo',['#F6DDD8','#B3261E','#8E2318','#EAF0DC','#3F5E22','#E1E8EE','#2F4F6B','#24425A']],
+  ],
+  vars:{
+    '--color-bg-default':'#F3E6C4','--color-bg-desk':'#E8D3B8','--color-surface-default':'#FFFBF0','--color-text-title':'#231409',
+    '--color-text-default':'#2A1A0E','--color-text-muted':'#6E4526','--color-text-subtle':'#8A5A33','--color-text-link':'#7F3A10',
+    '--color-action-primary-bg':'#53321B','--color-action-primary-text':'#FFFBF0','--color-action-secondary-bg':'#FFFBF0','--color-action-secondary-text':'#3A2212','--color-action-secondary-border':'#53321B',
+    '--color-action-tertiary-bg':'#F2E4CC','--color-action-tertiary-text':'#3A2212','--color-action-accent-bg':'#E7BC3A','--color-action-accent-text':'#231409',
+    '--color-feedback-success-bg':'#EAF0DC','--color-feedback-success-text':'#3F5E22','--color-feedback-warning-bg':'#FBEFC2','--color-feedback-warning-text':'#5B430E',
+    '--color-feedback-danger-bg':'#F6DDD8','--color-feedback-danger-text':'#8E2318','--color-feedback-info-bg':'#E1E8EE','--color-feedback-info-text':'#24425A',
+    '--color-chrome-titlebar-text':'#FFFBF0','--color-chrome-window-bg':'#FFFBF0','--color-chrome-window-border':'#53321B','--color-chrome-window-control-bg':'#53321B','--color-chrome-window-control-border':'#E7BC3A','--color-chrome-progress-track':'#F2E4CC',
+    '--chrome-shadow-color':'#3A2212','--chrome-shadow-x':'3px','--chrome-shadow-offset':'3px','--chrome-shadow-blur':'0px','--chrome-window-radius':'2px',
+    '--radius-control':'4px','--radius-card':'6px','--radius-pill':'4px','--radius-ctl-btn':'2px','--progress-h':'12px','--progress-radius':'2px',
+    '--font-ui':'Sarabun,"Noto Sans Thai",sans-serif','--font-heading':'Sarabun,sans-serif','--font-display':'Trirong,Sarabun,serif','--font-size':'16px','--line-height':'1.55','--display-weight':'700',
+    '--nav-bg':'#3A2212','--nav-text':'#FBF3DC','--nav-sel-bg':'#E7BC3A','--nav-sel-text':'#231409','--nav-border':'3px double #E7BC3A',
+    '--title-shadow':'none','--card-border':'1px solid #D9B898','--card-shadow':'0 0 0 3px #FFFBF0, 0 0 0 4px #D9B898',
+    '--btn-p-border':'#3A2212','--btn-p-shadow':'inset 0 0 0 1px #E7BC3A','--btn-s-shadow':'none','--btn-a-border':'#A97E1C',
+    '--input-border':'1px solid #A8744A','--input-bg':'#FFFFFF','--input-shadow':'none','--alert-border':'1px solid #00000020',
+    '--progress-fill':'linear-gradient(90deg,#CFA02A,#E7BC3A)','--progress-border':'1px solid #53321B',
+    '--titlebar-bg':'#53321B','--titlebar-rule':'3px solid #E7BC3A','--ctl-close-bg':'#B3261E'
+  },
+  groups:[
+    ['Canvas & surface',['--color-bg-default','--color-bg-desk','--color-surface-default','--color-text-title']],
+    ['Text',['--color-text-default','--color-text-muted','--color-text-subtle','--color-text-link']],
+    ['Actions',['--color-action-primary-bg','--color-action-secondary-border','--color-action-tertiary-bg','--color-action-accent-bg']],
+    ['Feedback',['--color-feedback-success-bg','--color-feedback-warning-bg','--color-feedback-danger-bg','--color-feedback-info-bg']],
+    ['Chrome / brand',['--color-chrome-window-border','--ctl-close-bg','--color-chrome-progress-track']],
+  ],
+  facts:[
+    ['Font','Sarabun 400/500/600/700 for everything, 16px body / 1.55 (Sarabun runs small). Trirong 700 on page titles only.'],
+    ['Shape','Controls 4px · cards 6px · windows 2px. Cards get a double-rule frame (1px line, 3px gap, 1px line).'],
+    ['Depth','No soft shadows. Banners and pop-ups keep the hard offset shadow, in teak.'],
+    ['Brand marks','Gold 3px double rule under the nav. Red #B3261E is only for the ตราประทับ stamp, danger and close.'],
+    ['Focus','2px teak outline + 2px gold offset ring.'],
+    ['Desk','Paper desk becomes warm tan #E8D3B8. The paper stays white.'],
+    ['Voice','Optional: ที่ / วันที่ / เรียน / “ขอแสดงความนับถือ” as microcopy flourishes.'],
+  ],
+  pairs:[['text on card','--color-text-default','--color-surface-default'],['muted on card','--color-text-muted','--color-surface-default'],['subtle on card','--color-text-subtle','--color-surface-default'],['cream on primary','--color-action-primary-text','--color-action-primary-bg'],['link on card','--color-text-link','--color-surface-default'],['ink on gold','--color-action-accent-text','--color-action-accent-bg'],['title on canvas','--color-text-title','--color-bg-default'],['muted on canvas','--color-text-muted','--color-bg-default'],['success','--color-feedback-success-text','--color-feedback-success-bg'],['warning','--color-feedback-warning-text','--color-feedback-warning-bg'],['danger','--color-feedback-danger-text','--color-feedback-danger-bg'],['info','--color-feedback-info-text','--color-feedback-info-bg']],
+  nav:['ตรวจ','จัดเรียง','ส่งออก'], navTitle:'ราชการ-ดิส',
+  winTitle:'บันทึกข้อความ', demoTitle:'บันทึกข้อความ ส่วนราชการ',
+},
+{
+  id:'aipass', cls:'t-ai', tag:'THEME 3 · TH-AI Passport',
+  name:'AI Passport blue',
+  concept:'Tokens lifted from aipass.go.th: passport blue #0052FF as the single action colour, mint #56FFC6 as the highlight, near-black #1E1E1E ink, large 16–24px radii and soft blue-tinted shadows. Loops on the Thai (Noto Sans Thai Looped).',
+  scales:[
+    ['Brand blue (site: --brand-*)',['#EFF4FD','#EEF3FF','#D7E5FC','#B3CBF0','#8EB2E9','#357DF0','#0052FF','#0047DC','#0038B6','#002D92','#082762']],
+    ['Accents',['#00B4FF','#56FFC6','#EEFFF9','#C5EC67','#905EFF']],
+    ['Neutrals (site: --gray-*)',['#FDFDFD','#F9F9F9','#F3F3F3','#F1F1F1','#E4E4E4','#B9B9B9','#989898','#686868','#4B4B4B','#1E1E1E']],
+    ['Status',['#ECFDF3','#17B26A','#067647','#FFF4E6','#FF8C05','#8C4D03','#FEF3F2','#F04438','#B42318']],
+  ],
+  vars:{
+    '--color-bg-default':'#F3F3F3','--color-bg-desk':'#D7E5FC','--color-surface-default':'#FFFFFF','--color-text-title':'#1E1E1E',
+    '--color-text-default':'#1E1E1E','--color-text-muted':'#4B4B4B','--color-text-subtle':'#686868','--color-text-link':'#0047DC',
+    '--color-action-primary-bg':'#0052FF','--color-action-primary-text':'#FFFFFF','--color-action-secondary-bg':'#FFFFFF','--color-action-secondary-text':'#1E1E1E','--color-action-secondary-border':'#B9B9B9',
+    '--color-action-tertiary-bg':'#EEF3FF','--color-action-tertiary-text':'#0047DC','--color-action-accent-bg':'#56FFC6','--color-action-accent-text':'#1E1E1E',
+    '--color-feedback-success-bg':'#ECFDF3','--color-feedback-success-text':'#067647','--color-feedback-warning-bg':'#FFF4E6','--color-feedback-warning-text':'#8C4D03',
+    '--color-feedback-danger-bg':'#FEF3F2','--color-feedback-danger-text':'#B42318','--color-feedback-info-bg':'#D7E5FC','--color-feedback-info-text':'#204B90',
+    '--color-chrome-titlebar-text':'#FFFFFF','--color-chrome-window-bg':'#FFFFFF','--color-chrome-window-border':'#0052FF','--color-chrome-window-control-bg':'#FFFFFF33','--color-chrome-window-control-border':'#FFFFFF66','--color-chrome-progress-track':'#D7E5FC',
+    '--chrome-shadow-color':'#0052FF2E','--chrome-shadow-x':'0px','--chrome-shadow-offset':'10px','--chrome-shadow-blur':'28px','--chrome-window-radius':'16px',
+    '--radius-control':'10px','--radius-card':'16px','--radius-pill':'9999px','--radius-ctl-btn':'9999px','--progress-h':'8px','--progress-radius':'9999px',
+    '--font-ui':'"Noto Sans Thai Looped","Noto Sans Thai",sans-serif','--font-heading':'"Noto Sans Thai Looped",sans-serif','--font-display':'"Noto Sans Thai Looped",sans-serif','--font-size':'15px','--line-height':'1.5','--display-weight':'700',
+    '--nav-bg':'#FFFFFF','--nav-text':'#1E1E1E','--nav-sel-bg':'#0052FF','--nav-sel-text':'#FFFFFF','--nav-border':'1px solid #E4E4E4',
+    '--title-shadow':'none','--card-border':'1px solid #F1F1F1','--card-shadow':'0 8px 24px #1E1E1E0F',
+    '--btn-p-border':'#0052FF','--btn-p-shadow':'0 10px 28px #0052FF2E','--btn-s-shadow':'none','--btn-a-border':'#56FFC6',
+    '--input-border':'1px solid #B9B9B9','--input-bg':'#FFFFFF','--input-shadow':'none','--alert-border':'1px solid transparent',
+    '--progress-fill':'linear-gradient(45deg,#357DF0,#0052FF 52%,#0038B6)','--progress-border':'0',
+    '--titlebar-bg':'radial-gradient(circle at 14% 0%,#FFFFFF2E,transparent 34%),radial-gradient(circle at 92% 112%,#56FFC624,transparent 34%),linear-gradient(135deg,#0038B6,#0052FF 56%,#0047DC)','--titlebar-rule':'0','--ctl-close-bg':'#FFFFFF33'
+  },
+  groups:[
+    ['Canvas & surface',['--color-bg-default','--color-bg-desk','--color-surface-default','--color-text-title']],
+    ['Text',['--color-text-default','--color-text-muted','--color-text-subtle','--color-text-link']],
+    ['Actions',['--color-action-primary-bg','--color-action-secondary-border','--color-action-tertiary-bg','--color-action-accent-bg']],
+    ['Feedback',['--color-feedback-success-bg','--color-feedback-warning-bg','--color-feedback-danger-bg','--color-feedback-info-bg']],
+    ['Chrome',['--color-chrome-window-border','--color-chrome-progress-track']],
+  ],
+  facts:[
+    ['Font','Noto Sans Thai Looped 400/500/600/700 for UI (the site’s --font-sans); Noto Sans Thai for the display line (--font-landing). Body 15px.'],
+    ['Shape','Controls 10px · cards 16px · pop-ups 16–24px · nav pills fully round. Source scale: 6/8/10/12/16/24/full.'],
+    ['Depth','Card 0 8px 24px #1E1E1E0F. Primary button and pop-ups float on 0 10px 28px #0052FF2E.'],
+    ['Brand panel','135° #0038B6 → #0052FF → #0047DC with white and mint glows. Used only on banners, pop-up title and the export-done card, never as page background.'],
+    ['Highlight','Mint #56FFC6 for the accent button and “new” markers. Always with #1E1E1E text.'],
+    ['Focus','2px #0052FF ring with 3px #0052FF40 halo.'],
+  ],
+  pairs:[['text','--color-text-default','--color-surface-default'],['muted','--color-text-muted','--color-surface-default'],['subtle on card','--color-text-subtle','--color-surface-default'],['subtle on canvas','--color-text-subtle','--color-bg-default'],['white on blue','--color-action-primary-text','--color-action-primary-bg'],['link','--color-text-link','--color-surface-default'],['ink on mint','--color-action-accent-text','--color-action-accent-bg'],['blue on tertiary','--color-action-tertiary-text','--color-action-tertiary-bg'],['success','--color-feedback-success-text','--color-feedback-success-bg'],['warning','--color-feedback-warning-text','--color-feedback-warning-bg'],['danger','--color-feedback-danger-text','--color-feedback-danger-bg'],['info','--color-feedback-info-text','--color-feedback-info-bg']],
+  nav:['Passport','ตรวจเอกสาร','ส่งออก'], navTitle:'TH-AI Passport',
+  winTitle:'ส่งออกเอกสาร', demoTitle:'เอกสารของฉัน',
+}];
+
+const lum = h => { h=h.replace('#',''); const c=[0,2,4].map(i=>parseInt(h.substr(i,2),16)/255).map(v=>v<=.03928?v/12.92:((v+.055)/1.055)**2.4); return .2126*c[0]+.7152*c[1]+.0722*c[2]; };
+const ratio = (a,b) => { const [x,y]=[lum(a),lum(b)].sort((p,q)=>q-p); return (x+.05)/(y+.05); };
+const ink = h => lum(h) > .4 ? '#000000aa' : '#ffffffcc';
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+
+const root = document.getElementById('themes');
+for (const t of T) {
+  const v = t.vars;
+  const scales = t.scales.map(([n,arr]) => `<div class="scale-row"><div class="name">${n}</div><div class="chips">${arr.map(h=>`<div class="chip" style="background:${h};color:${ink(h)}">${h.slice(1)}</div>`).join('')}</div></div>`).join('');
+  const groups = t.groups.map(([n,ks]) => `<div><h3>${n}</h3><div class="tokens">${ks.map(k=>`<div class="tok"><i style="background:${v[k]}"></i><span>${k.replace('--color-','')} <code>${v[k]}</code></span></div>`).join('')}</div></div>`).join('');
+  const facts = `<dl class="kv">${t.facts.map(([a,b])=>`<dt>${a}</dt><dd>${esc(b)}</dd>`).join('')}</dl>`;
+  const pairs = t.pairs.map(([n,f,b]) => { const r = ratio(v[f],v[b]); return `<span class="${r<4.5?'bad':''}">${n} ${r.toFixed(1)}</span>`; }).join('');
+  const demo = `
+  <div class="stage"><div class="demo ${t.cls}">
+    <div class="nav"><b>${t.navTitle}</b>${t.nav.map((n,i)=>`<span class="pill ${i==0?'sel':i==1?'out':''}">${n}</span>`).join('')}</div>
+    <div class="body">
+      <div class="page-title">${t.demoTitle}</div>
+      <div class="card">
+        <h4>เรื่อง ขอความอนุเคราะห์ข้อมูล</h4>
+        <div class="muted">ร่างเมื่อ 12 ต.ค. 2569 · 3 ข้อสังเกต</div>
+        <input class="input" value="ขอเรียนเชิญประชุมหารือแนวทางการดำเนินงาน">
+        <div class="row"><button class="btn p">ส่งออก DOCX</button><button class="btn s">ตรวจเอกสาร</button><button class="btn t">เรียงใหม่</button><button class="btn a">ใหม่</button><span class="link">ดูตัวอย่าง</span></div>
+      </div>
+      <div class="alerts"><div class="al ok">ผ่านรูปแบบ 12 ข้อ</div><div class="al wn">วันที่ไม่ใช่ พ.ศ.</div><div class="al er">ขาดคำลงท้าย</div><div class="al in">ใช้ฟอนต์ TH Sarabun New</div></div>
+      <div class="desk"><div class="paper">ที่ ศธ 0210/ว 123 &nbsp; (เอกสารจริงไม่เปลี่ยนตามธีม)</div></div>
+    </div>
+    <div class="win">
+      <div class="win-title"><span>${t.winTitle}</span><em><i></i><i></i><i class="x"></i></em></div>
+      <div class="win-body">กำลังสร้างไฟล์ PDF…<div class="progress"><span></span></div></div>
+    </div>
+  </div></div>`;
+  root.insertAdjacentHTML('beforeend', `
+  <section class="theme">
+    <div class="theme-head"><span class="tag">${t.tag}</span><h2>${esc(t.name)}</h2><p class="lede" style="margin-top:2px">${esc(t.concept)}</p></div>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div><h3>Palette</h3><div class="scale">${scales}</div></div>
+        <div><h3>Contrast (WCAG ratio, ≥4.5 for text)</h3><div class="contrast">${pairs}</div></div>
+      </div>
+      <div>${demo}</div>
+    </div>
+    <div class="grid2">
+      <div style="display:flex;flex-direction:column;gap:18px"><h3 style="margin:0">Semantic token overrides</h3>${groups}</div>
+      <div><h3>Type, shape, depth</h3>${facts}</div>
+    </div>
+  </section>`);
+  const el = root.querySelector('.demo.' + t.cls);
+  for (const [k, x] of Object.entries(v)) el.style.setProperty(k, x);
+}
+</script>
+</body>
+</html>

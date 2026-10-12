@@ -155,9 +155,9 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
           <Card title="ก่อนใช้งานจริง" count="3 เรื่อง">
             <div className="rows">
               <ChecklistRow
-                title="ตราครุฑ"
-                hint="ใช้ได้ทั้งเอกสารจากร่างเอกสารและจัดรูปแบบในขั้นออกเอกสาร ภาพอยู่ในเบราว์เซอร์นี้เท่านั้น"
-                tag={<Toggle checked={useGaruda} onChange={setUseGaruda} label="ใส่ตราครุฑในเอกสาร" />}
+                title="ตราเอกสาร"
+                hint="ใส่ตราโลโก้บริษัท หรือ ตราครุฑ ใช้ได้ทั้งเอกสารจากร่างเอกสารและจัดรูปแบบในขั้นออกเอกสาร ภาพอยู่ในเบราว์เซอร์นี้เท่านั้น"
+                tag={<Toggle checked={useGaruda} onChange={setUseGaruda} label="ใส่ตราในเอกสาร" />}
                 extra={
                   <>
                     <span className="xp-upload">
@@ -168,7 +168,7 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
                         className="input xp-file-input"
                         type="file"
                         accept="image/png,image/jpeg"
-                        aria-label="เลือกไฟล์ภาพตราครุฑ PNG หรือ JPG"
+                        aria-label="เลือกไฟล์ภาพตราเอกสาร PNG หรือ JPG"
                         onChange={(e) => {
                           onGaruda(e.currentTarget.files?.[0]);
                           e.currentTarget.value = "";
@@ -224,7 +224,7 @@ export function ExportStep({ onBack, stepper }: { onBack: () => void; stepper?: 
           <Paper
             doc={doc}
             options={opts}
-            caption={`ตัวอย่าง A4 · ${useGaruda && garuda ? "ใส่ภาพตราครุฑแล้ว" : "ตราครุฑเว้นว่าง"} · สีแดง = ยังขาด (ตอนพิมพ์เป็นสีดำ)`}
+            caption={`ตัวอย่าง A4 · ${useGaruda && garuda ? "ใส่ภาพตราแล้ว" : "ตราเว้นว่าง"} · สีแดง = ยังขาด (ตอนพิมพ์เป็นสีดำ)`}
           />
         </div>
       </div>
