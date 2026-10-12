@@ -1,0 +1,50 @@
+/* Joke themes (decision 0003): component rules that tokens cannot express. Every rule is scoped to a data-theme,
+   so `standard` (the original look) never matches anything here. Token values come from themes.generated.css. */
+
+/* ================= Windows XP ================= */
+[data-theme="xp"] { --shadow-focus-ring: 0 0 0 0 transparent; }
+[data-theme="xp"] :focus-visible { outline: 1px dotted #000; outline-offset: -4px; }
+[data-theme="xp"] .nav { background: linear-gradient(180deg, #3168D5, #245EDC 40%, #1941A5); }
+[data-theme="xp"] .logo, [data-theme="xp"] .nav-tagline { color: var(--color-nav-text); }
+[data-theme="xp"] .nav-divider { background: #ffffff66; }
+[data-theme="xp"] .nav-item:hover:not(.on) { background: #ffffff26; }
+[data-theme="xp"] .nav .pill.outline { background: transparent; border-color: #fff; color: #fff; }
+[data-theme="xp"] .nav .pill.solid { background: var(--beige-50); color: var(--xp-ink); border: 1px solid var(--xp-border-blue); }
+/* text sitting straight on the blue desktop */
+[data-theme="xp"] .page-head { --color-text-default: #fff; --color-text-muted: var(--xpblue-50); --color-text-subtle: var(--xpblue-100); --color-border-strong: #fff; --color-feedback-success-icon: var(--xpgreen-200); }
+[data-theme="xp"] .page-head h1 { text-shadow: 1px 1px 0 #0A246A; }
+[data-theme="xp"] .card { border: 1px solid #fff; box-shadow: inset -1px -1px 0 #ACA899, 2px 3px 8px #00000073; }
+[data-theme="xp"] .btn.primary { border-color: var(--xp-border-blue); box-shadow: inset 0 0 0 1px var(--xpblue-400); }
+[data-theme="xp"] .btn.secondary { box-shadow: inset 0 -2px 0 var(--beige-200); }
+[data-theme="xp"] .btn.tertiary { border-color: var(--beige-400); }
+[data-theme="xp"] .btn.primary:hover:not(:disabled), [data-theme="xp"] .btn.secondary:hover:not(:disabled), [data-theme="xp"] .btn.tertiary:hover:not(:disabled) { box-shadow: inset 0 0 0 2px #F5A930; }
+[data-theme="xp"] .window-title { background: linear-gradient(180deg, #3D8BFF 0%, var(--xpblue-600) 45%, #0035A8 100%); font-family: var(--font-display); font-weight: 700; }
+[data-theme="xp"] .progress > span { background: repeating-linear-gradient(90deg, var(--color-chrome-progress-fill) 0 8px, transparent 8px 10px); }
+
+/* ================= ราชการไทย ================= */
+[data-theme="gov"] { --shadow-focus-ring: 0 0 0 2px var(--cream-50), 0 0 0 4px var(--teak-800); }
+[data-theme="gov"] body { font-size: 16px; line-height: 1.55; }
+[data-theme="gov"] .btn, [data-theme="gov"] .input, [data-theme="gov"] .textarea, [data-theme="gov"] .select, [data-theme="gov"] .t-body-m, [data-theme="gov"] .t-label-m { font-size: 16px; }
+[data-theme="gov"] .nav { border-bottom: 3px double var(--gold-400); }
+[data-theme="gov"] .logo { color: var(--cream-50); }
+[data-theme="gov"] .nav-tagline { color: var(--cream-300); }
+[data-theme="gov"] .nav-divider { background: #E8D5A666; }
+[data-theme="gov"] .nav-item:hover:not(.on) { background: #FBF3DC1F; }
+[data-theme="gov"] .nav .pill.outline { background: transparent; border-color: var(--cream-100); color: var(--cream-100); }
+[data-theme="gov"] .nav .pill.solid { background: var(--cream-50); color: var(--teak-900); }
+/* double-rule frame (เส้นคู่): 1px line, 3px gap, 1px line */
+[data-theme="gov"] .card { border: 1px solid var(--teak-300); box-shadow: 0 0 0 3px var(--cream-50), 0 0 0 4px var(--teak-300); }
+[data-theme="gov"] .btn.primary { border-color: var(--teak-900); box-shadow: inset 0 0 0 1px var(--gold-400); }
+[data-theme="gov"] .window-title { border-bottom: 3px solid var(--gold-400); }
+[data-theme="gov"] .progress > span { background: linear-gradient(90deg, var(--gold-500), var(--gold-400)); }
+
+/* ================= TH-AI Passport ================= */
+[data-theme="aipass"] { --shadow-focus-ring: 0 0 0 3px #0052FF40; }
+[data-theme="aipass"] .card { border: 1px solid var(--aigray-300); box-shadow: 0 8px 24px #1E1E1E0F; }
+[data-theme="aipass"] .btn.primary { box-shadow: 0 10px 28px #0052FF2E; }
+[data-theme="aipass"] .pill.solid { box-shadow: 0 10px 28px #0052FF2E; }
+/* brand panel: only on banner chips and pop-up title bars, never the page background */
+[data-theme="aipass"] .window-title, [data-theme="aipass"] .banner .chip {
+  background: radial-gradient(circle at 14% 0%, #FFFFFF2E, transparent 34%), radial-gradient(circle at 92% 112%, #56FFC624, transparent 34%), linear-gradient(135deg, var(--aibrand-700), var(--aibrand-500) 56%, var(--aibrand-600)); }
+[data-theme="aipass"] .progress { border: 0; border-radius: var(--radius-full); }
+[data-theme="aipass"] .progress > span { background: linear-gradient(45deg, var(--aibrand-400), var(--aibrand-500) 52%, var(--aibrand-700)); }
