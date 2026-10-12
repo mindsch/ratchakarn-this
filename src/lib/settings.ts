@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { ProviderKind } from "./llm/providers";
+import { PRESETS } from "./llm/presets";
 
 export interface McpEntry {
   url: string;
@@ -31,7 +32,7 @@ const DEFAULTS: Settings = {
   presetId: "typhoon",
   kind: "openai",
   baseUrl: "https://api.opentyphoon.ai/v1",
-  model: "",
+  model: "typhoon-v2.5-30b-a3b-instruct",
   apiKey: "",
   rememberKey: false,
   mcp: [],
@@ -107,7 +108,7 @@ export function providerPatch(
     presetId: target.id,
     kind: saved?.kind ?? target.kind,
     baseUrl: saved?.baseUrl ?? target.baseUrl,
-    model: saved?.model ?? "",
+    model: saved?.model ?? PRESETS.find((x) => x.id === target.id)?.models[0] ?? "",
     apiKey: readSecret(target.id),
   };
 }
