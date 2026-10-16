@@ -1,5 +1,7 @@
 # แปลเป็นราชการ · Ratchakarn-this
 
+**ภาษาไทย** (ด้านล่าง) · [**English**](#english)
+
 เขียนภาษาราชการ ร่างหนังสือราชการ และออกเป็น DOCX/PDF ที่พิมพ์ใช้ได้จริง
 Turn plain text (Thai, English, any language) into Thai ราชการ register, draft official Thai documents, and export them as DOCX/PDF.
 
@@ -60,7 +62,9 @@ prompts/            ต้นทางพรอมต์ (core, modes, doctypes,
 scripts/            build-prompts.mjs, smoke-export.ts (ทดสอบส่งออก), mock-server.mjs (เซิร์ฟเวอร์ปลอมไว้ทดสอบ UI)
 src/lib/doc/        โครงเอกสาร, parser แม่แบบ, โปรไฟล์จัดหน้า, ตัวสร้าง DOCX และ HTML/PDF
 src/lib/llm/        providers (OpenAI-compatible / Anthropic / Gemini), presets, MCP client
-src/components/     Chat, Export, CopyPrompt, SettingsPanel
+src/pages/          หน้าแชต, ร่างเอกสาร, จัดรูปแบบ, ออกเอกสาร, พรอมต์, ตั้งค่า
+src/ui/             คอมโพเนนต์พื้นฐาน (NavBar ฯลฯ)
+src/styles/         โทเคนสีและธีม
 docs/decisions/     บันทึกการตัดสินใจและแผน
 ```
 
@@ -82,3 +86,102 @@ docs/decisions/     บันทึกการตัดสินใจและ
 ## สัญญาอนุญาต
 
 MIT — ดู [LICENSE](LICENSE) · ผู้เขียนไม่รับผิดชอบต่อผลของการใช้งาน
+
+## การมีส่วนร่วม
+
+สาขา `main` ถูกป้องกันไว้ ห้าม push ตรง ให้แตกสาขาแล้วเปิด pull request ดู [CONTRIBUTING.md](CONTRIBUTING.md)
+
+---
+
+<a id="english"></a>
+
+# English
+
+**Ratchakarn-this**: write in Thai official register (ภาษาราชการ), draft official Thai documents, and export print-ready DOCX/PDF.
+
+Turn plain text (Thai, English, any language) into the formal register used in Thai government letters, draft official documents, and export them in the standard layout.
+
+Born at a "stupid hackathon", meant to be genuinely useful. **Bring your own AI**: nothing here costs the author money, and your API key never leaves your browser.
+
+> ⚠️ **Disclaimer.** AI output can be wrong. You are responsible for everything you do with it. The project does not guarantee that any agency or court will accept a document.
+> Court and legal documents are **first drafts only, not legal advice. Read them carefully and consult a lawyer before real use.**
+
+## What it does
+
+| Tab | What it does |
+|---|---|
+| **Chat** (แชต) | Converts text into ราชการ register (a "formality dial" from 0 to 4, from practical to joke-level), drafts documents, reformats existing text, and drafts Labour Court documents (it interviews you for the facts first and never invents them) |
+| **Export** (ออกเอกสาร) | Paste text or fill in a form, then get DOCX or PDF in official letter layout. **No chat and no API key needed.** |
+| **Prompts** (พรอมต์) | Copy the prompts into ChatGPT / Claude / Gemini / a Thai model, then paste the result back into "Export" |
+
+Supported documents: external letters (request, invitation, reply, decline, thanks, etc.), internal memos (บันทึกข้อความ), petitions (คำร้อง), certificates (หนังสือรับรอง), orders (คำสั่ง), announcements (ประกาศ), and a Labour Court set (complaint, witness list, motions).
+
+## Run
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # static site in dist/ — host anywhere (Vercel, Cloudflare Pages, GitHub Pages)
+```
+
+In the Chat tab, open ⚙ model settings, pick a provider (OpenAI-compatible / Anthropic / Gemini), and enter the Base URL, model name, and your own key.
+Examples: Typhoon, local Ollama, OpenRouter, ThaiLLM, OpenAI, Claude, Gemini. The presets are starting suggestions and have **not been tested against the live services**, so check the URL and model name against each provider's docs. The model field offers a list of suggestions (checked 2026-10-12), or choose "Other" to type your own.
+
+CORS note: some providers do not allow calls straight from a browser. Use another provider or run a local model (Ollama needs `OLLAMA_ORIGINS` set).
+
+### MCP (experimental)
+Add a remote MCP server (Streamable HTTP) in Settings. In this version it works with OpenAI-compatible providers only. Every tool call is shown in the chat. The server must enable CORS.
+
+## Prompts (work with any AI)
+
+The source lives in [`prompts/`](prompts/). `npm run prompts` compiles it into:
+- `public/prompts/ratchakarn-all.md` (combined), `ratchakarn-convert.md` (short, for small models), `ratchakarn-draft.md`, `ratchakarn-court-labour.md`
+- `src/generated/prompts.ts`, which the web app uses as its system prompt
+
+The prompts in the app and the prompts you copy come from the same source. Edit only the files in `prompts/`.
+
+## Design principles
+
+- **The model writes the wording, code does the layout.** The model outputs a text template ([`prompts/output-template.md`](prompts/output-template.md)); DOCX/PDF layout is predictable code ([`src/lib/doc/`](src/lib/doc/)).
+- **Layout numbers are convention, not law.** Values live in [`src/lib/doc/layout.ts`](src/lib/doc/layout.ts) as several profiles you can extend (A4, TH Sarabun New 16 pt, margins left 3 / right 2 / top 1.5 / bottom 2 cm, etc.).
+- **Emblem (Garuda / company logo):** we do not ship the Garuda image because it is a legally protected mark. Documents leave a blank slot for you to fill, or you can upload an image you have the right to use (it stays in your browser and is sent nowhere). Checking usage rights is your responsibility.
+- **No invented facts.** Missing information appears as `[ระบุ...]` ("specify...").
+- Courts: **Labour Court only** for now, based on sample forms the Labour Court publishes. Other courts will be added when their forms are available.
+
+Fonts: DOCX uses TH Sarabun New, so install it first (it is free). For PDF, choose "Save as PDF" in the print dialog and turn off headers and footers.
+
+## Structure
+
+```
+prompts/            prompt sources (core, modes, doctypes, output-template, disclaimer)
+scripts/            build-prompts.mjs, smoke-export.ts (export test), mock-server.mjs (fake server for UI testing)
+src/lib/doc/        document model, template parser, layout profiles, DOCX and HTML/PDF builders
+src/lib/llm/        providers (OpenAI-compatible / Anthropic / Gemini), presets, MCP client
+src/pages/          Chat, Draft, Format, Export, Prompts, Settings pages
+src/ui/             base components (NavBar etc.)
+src/styles/         color tokens and themes
+docs/decisions/     decision records and plans
+```
+
+Testing: `npx tsx scripts/smoke-export.ts ./out` generates every DOCX type from samples. `node scripts/mock-server.mjs` starts a fake model and fake MCP server at `localhost:8787` so you can try the UI without a key.
+
+## Known limitations
+
+- Not yet tested against real models (the quality of the ราชการ language is unmeasured); a small evaluation set is planned.
+- Positions of the ที่ / date / subject / "Dear" lines are estimates from one agency's manual and have not been checked against an official form.
+- The Labour Court layout follows the only form that could be read (a wage complaint); the court form's actual fonts and spacing are unverified.
+- No sealed letters (หนังสือประทับตรา), meeting minutes, or other courts.
+- MCP: OpenAI-compatible only.
+- PDF uses the browser's print function.
+
+## Roadmap
+
+Fine-tune a real model (Typhoon / Qwen) from the prompts, an evaluation set, and the collected text→ราชการ pairs · OCR of sample letters · other courts · sealed letters and meeting minutes.
+
+## Contributing
+
+`main` is protected: no direct pushes. Create a branch and open a pull request. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## License
+
+MIT, see [LICENSE](LICENSE). The author is not liable for how the tool is used.
